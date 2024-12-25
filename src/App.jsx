@@ -5,7 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import MainPage from "./pages/MainPage";
-//import MainPage from "./pages/MainPage";
+import Profile from "./pages/Profile";
 import CartPage from "./pages/CartPage";
 import ManagerPage from "./pages/ManagerPage";
 import CourierPage from "./pages/CourierPage";
@@ -48,6 +48,7 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/main" element={<MainPage />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
