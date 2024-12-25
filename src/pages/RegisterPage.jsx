@@ -21,19 +21,21 @@ function RegisterPage() {
       const userData = {
         name,
         //phone,
-        email: username,
+        username,
         //address,
         password,
+        passwordConfirmation,
       };
 
       const response = await registerUser(userData); // Вызов функции регистрации
       console.log("Пользователь зарегистрирован:", response);
       alert("Регистрация успешна!");
-      navigate("/"); // Перенаправление на страницу логина
+      navigate("/main"); // Перенаправление на главную
     } catch (error) {
-      console.error("Ошибка регистрации:", error);
-      alert(error.message || "Ошибка регистрации. Попробуйте ещё раз.");
+      console.error("Ошибка регистрации:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Ошибка регистрации. Попробуйте ещё раз.");
     }
+    
   };
 
   const goToLogin = () => {
