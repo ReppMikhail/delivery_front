@@ -4,9 +4,9 @@ import { registerUser } from "../http/authService";
 
 function RegisterPage() {
   const [name, setName] = useState("");
-  // const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("");
   const [username, setEmail] = useState("");
-  // const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setConfirmPassword] = useState("");
   const navigate = useNavigate();
@@ -20,9 +20,9 @@ function RegisterPage() {
     try {
       const userData = {
         name,
-        //phone,
+        phone,
         username,
-        //address,
+        address,
         password,
         passwordConfirmation,
       };
@@ -57,7 +57,7 @@ function RegisterPage() {
           />
         </div>
 
-        {/* <div style={styles.inputWrapper}>
+        <div style={styles.inputWrapper}>
           <span style={styles.icon}>📞</span>
           <input
             type="tel"
@@ -66,7 +66,7 @@ function RegisterPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
-        </div> */}
+        </div>
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>📧</span>
@@ -79,7 +79,7 @@ function RegisterPage() {
           />
         </div>
 
-        {/* <div style={styles.inputWrapper}>
+        <div style={styles.inputWrapper}>
           <span style={styles.icon}>🏠</span>
           <input
             type="text"
@@ -88,7 +88,7 @@ function RegisterPage() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
-        </div> */}
+        </div>
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>🔒</span>
