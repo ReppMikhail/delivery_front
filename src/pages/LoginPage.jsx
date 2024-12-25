@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import { loginUser } from "../http/authService";
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
   const [login, setLogin] = useState("");
@@ -10,14 +11,30 @@ function LoginPage() {
   const handleLogin = async () => {
     if (login && password) {
       try {
-        const userData = { username: login, password }; // Формируем данные для отправки
-        const response = await loginUser(userData); // Вызов функции loginUser
+        const userData = { username: login, password };
+        const response = await loginUser(userData);
+  
         console.log("Успешный вход:", response);
-
-        // Здесь можно сохранить токен или перенаправить пользователя
-        alert("Вы успешно вошли!");
-        // Например, перенаправить на главную страницу
-        navigate("/");
+  
+        // Сохранение данных в localStorage
+        const { id, accessToken, refreshToken } = response;
+        localStorage.setItem("authData", JSON.stringify({ id, accessToken, refreshToken }));
+  
+        // Декодирование токена для получения роли
+        const decodedToken = jwtDecode(accessToken);
+        const roles = decodedToken.roles; // массив ролей из токена
+  
+        console.log("Роль пользователя:", roles);
+  
+        // Перенаправление в зависимости от роли
+        if (roles.includes("ROLE_MANAGER")) {
+          navigate("/manager");
+        } else if (roles.includes("ROLE_COURIER")) {
+          navigate("/courier");
+        } else {
+          console.error("Неизвестная роль");
+          alert("Ошибка: неизвестная роль пользователя.");
+        }
       } catch (error) {
         console.error("Ошибка авторизации:", error);
         alert(error.message || "Ошибка входа. Проверьте логин и пароль.");
@@ -26,6 +43,36 @@ function LoginPage() {
       alert("Введите логин и пароль!");
     }
   };
+
+  // const handleLogin = async () => {
+  //   if (login && password) {
+  //     try {
+  //       const userData = { username: login, password };
+  //       const response = await loginUser(userData);
+        
+  //       console.log("Успешный вход:", response);
+  
+  //       // Предположим, роль пользователя приходит в ответе
+  //       const { role } = response.data;
+  //       localStorage.setItem("role", role); // Сохранение роли пользователя
+  //       localStorage.setItem("token", response.data.token); // Сохранение токена (опционально)
+  
+  //       alert("Вы успешно вошли!");
+  
+  //       // Перенаправление в зависимости от роли
+  //       if (role === "manager") {
+  //         navigate("/manager");
+  //       } else {
+  //         navigate("/"); // Другие роли
+  //       }
+  //     } catch (error) {
+  //       console.error("Ошибка авторизации:", error);
+  //       alert(error.message || "Ошибка входа. Проверьте логин и пароль.");
+  //     }
+  //   } else {
+  //     alert("Введите логин и пароль!");
+  //   }
+  // };
 
   const goToRegister = () => {
     navigate("/register");

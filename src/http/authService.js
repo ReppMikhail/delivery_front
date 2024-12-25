@@ -32,9 +32,14 @@ export const registerUser = async (userData) => {
 // Функция для входа пользователя
 export const loginUser = async (userData) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/login`, userData);
-        return response.data; // Успешный ответ
+      const response = await axios.post(`${API_BASE_URL}/login`, userData);
+      return {
+        id: response.data.id,
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      };
     } catch (error) {
-        throw error.response ? error.response.data : new Error('Network Error');
+      throw error.response ? error.response.data : new Error("Network Error");
     }
-};
+  };
+  
