@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import MainPage from "./pages/MainPage";
 import ManagerPage from "./pages/ManagerPage";
 import CourierPage from "./pages/CourierPage";
+import AdminPage from "./pages/AdminPage";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -45,8 +46,10 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/main" element={<MainPage />} />
+      <Route path="/admin" element={<AdminPage />} />
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
       <Route path="/courier" element={<ProtectedRoute role="ROLE_COURIER"><CourierPage /></ProtectedRoute>} />
+      {/* <Route path="/admin" element={<ProtectedRoute role="ROLE_ADMIN"><AdminPage /></ProtectedRoute>} /> */}
     </Routes>
   );
 }
