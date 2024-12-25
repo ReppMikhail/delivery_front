@@ -31,6 +31,8 @@ function LoginPage() {
           navigate("/manager");
         } else if (roles.includes("ROLE_COURIER")) {
           navigate("/courier");
+        } else if (roles.includes("ROLE_CUSTOMER")) {
+            navigate("/main");
         } else {
           console.error("Неизвестная роль");
           alert("Ошибка: неизвестная роль пользователя.");

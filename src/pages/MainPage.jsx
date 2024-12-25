@@ -1,48 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 //import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import "./MainPage.css"; // Для стилизации (опционально)
+import { fetchDishes } from "../http/authService";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
+  const [dishes, setDishes] = useState([]);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [sortVisible, setSortVisible] = useState(false);
 
-  const dishes = [
-    {
-      id: 1,
-      name: "Гункан лосось",
-      weight: "40 г",
-      ingredients: "Нори, рис, японский майонез, бальзамик, трюфельная сальса, кунжутное масло",
-      price: 190,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Гункан креветка",
-      weight: "40 г",
-      ingredients: "Нори, рис, японский майонез, бальзамик, трюфельная сальса, кунжутное масло",
-      price: 190,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Нигири угорь",
-      weight: "40 г",
-      ingredients: "Нори, рис, японский майонез, бальзамик, трюфельная сальса, кунжутное масло",
-      price: 190,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 4,
-      name: "Нигири угорь",
-      weight: "252 г",
-      ingredients: "Нори, рис, японский майонез, бальзамик, трюфельная сальса, кунжутное масло",
-      price: 190,
-      image: "https://via.placeholder.com/150",
-    },
-  ];
+  useEffect(() => {
+    const loadDishes = async () => {
+      try {
+        const data = await fetchDishes();
+        setDishes(data);
+      } catch (error) {
+        console.error("Ошибка загрузки блюд:", error);
+        alert("Не удалось загрузить данные. Попробуйте позже.");
+      }
+    };
+
+    loadDishes();
+  }, []);
 
   return (
     <div className="main-page">
@@ -71,21 +52,31 @@ const MainPage = () => {
         <button onClick={() => setSortVisible(!sortVisible)}>Сортировка</button>
       </div>
 
-      {/* Раздел "Суши" */}
-      <h2>Суши</h2>
+      {/* Раздел "Блюда" */}
+      <h2>Блюда</h2>
       <div className="dishes">
-        {dishes.map((dish) => (
-          <div className="dish-card" key={dish.id}>
-            <img src={dish.image} alt={dish.name} className="dish-image" />
-            <h3 className="dish-name">{dish.name}</h3>
-            <p className="dish-weight">Вес: {dish.weight}</p>
-            <p className="dish-ingredients">{dish.ingredients}</p>
-            <div className="dish-footer">
-              <span className="dish-price">{dish.price} руб</span>
-              <button className="add-to-cart">+</button>
+        {dishes.length === 0 ? (
+          <p>Загрузка блюд...</p>
+        ) : (
+          dishes.map((dish) => (
+            <div className="dish-card" key={dish.id}>
+              <img
+                src={dish.imageUrl || "https://via.placeholder.com/150"}
+                alt={dish.name}
+                className="dish-image"
+              />
+              <h3 className="dish-name">{dish.name}</h3>
+              <p className="dish-weight">Вес: {dish.weight} г</p>
+              <p className="dish-ingredients">
+                {dish.ingredients.map((ingredient) => ingredient.name).join(", ")}
+              </p>
+              <div className="dish-footer">
+                <span className="dish-price">{dish.price} руб</span>
+                <button className="add-to-cart">+</button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
