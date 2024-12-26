@@ -1,33 +1,91 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-//import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
-import "./MainPage.css"; // Для стилизации (опционально)
+import "./MainPage.css";
 import { fetchDishes } from "../http/authService";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
   const [dishes, setDishes] = useState([]);
+  const [filteredDishes, setFilteredDishes] = useState([]);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [sortDropdownVisible, setSortDropdownVisible] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [sortVisible, setSortVisible] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState({
+    maxPrice: "",
+    minWeight: "",
+  });
 
+  // Загрузка блюд
   useEffect(() => {
     const loadDishes = async () => {
+      setLoading(true);
       try {
         const data = await fetchDishes();
         setDishes(data);
+        setFilteredDishes(data);
       } catch (error) {
         console.error("Ошибка загрузки блюд:", error);
         alert("Не удалось загрузить данные. Попробуйте позже.");
       }
+      setLoading(false);
     };
 
     loadDishes();
   }, []);
 
+  // Фильтрация по категории
+  const handleCategoryClick = (category) => {
+    const newCategory = category === activeCategory ? null : category;
+    setActiveCategory(newCategory);
+
+    if (newCategory) {
+      const filtered = dishes.filter((dish) => dish.category === newCategory);
+      setFilteredDishes(filtered);
+    } else {
+      setFilteredDishes(dishes);
+    }
+  };
+
+  // Применение сортировки
+  const applySorting = (sortKey) => {
+    const sorted = [...filteredDishes].sort((a, b) => {
+      if (sortKey === "priceAsc") return a.price - b.price;
+      if (sortKey === "priceDesc") return b.price - a.price;
+      return 0;
+    });
+    setFilteredDishes(sorted);
+    setSortDropdownVisible(false); // Закрыть выпадающий список после выбора
+  };
+
+  // Применение фильтров
+  const applyFilters = () => {
+    let filtered = [...dishes];
+
+    if (filterCriteria.maxPrice) {
+      filtered = filtered.filter((dish) => dish.price <= filterCriteria.maxPrice);
+    }
+
+    if (filterCriteria.minWeight) {
+      filtered = filtered.filter((dish) => dish.weight >= filterCriteria.minWeight);
+    }
+
+    setFilteredDishes(filtered);
+    setFiltersVisible(false); // Скрыть окно фильтров после применения
+  };
+
+  // Обновление фильтров
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilterCriteria((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <div className="main-page">
-      {/* Навигационная панель */}
       <header className="navbar">
         <div className="navbar-left">
           <button onClick={() => navigate("/main")}>Главная</button>
@@ -42,23 +100,92 @@ const MainPage = () => {
 
       {/* Категории */}
       <div className="categories">
-        <button>Закуски</button>
-        <button>Супы</button>
-        <button>Горячее</button>
-        <button>Десерты</button>
-        <button>Напитки</button>
-        <button>Салаты</button>
+        <button
+          className={activeCategory === "Закуски" ? "active" : ""}
+          onClick={() => handleCategoryClick("Закуски")}
+        >
+          Закуски
+        </button>
+        <button
+          className={activeCategory === "Суп" ? "active" : ""}
+          onClick={() => handleCategoryClick("Суп")}
+        >
+          Супы
+        </button>
+        <button
+          className={activeCategory === "Горячее" ? "active" : ""}
+          onClick={() => handleCategoryClick("Горячее")}
+        >
+          Горячее
+        </button>
+        <button
+          className={activeCategory === "Десерты" ? "active" : ""}
+          onClick={() => handleCategoryClick("Десерты")}
+        >
+          Десерты
+        </button>
+        <button
+          className={activeCategory === "Напиток" ? "active" : ""}
+          onClick={() => handleCategoryClick("Напиток")}
+        >
+          Напитки
+        </button>
+        <button
+          className={activeCategory === "Салат" ? "active" : ""}
+          onClick={() => handleCategoryClick("Салат")}
+        >
+          Салаты
+        </button>
+
+        {/* Сортировка */}
+        <div className="sort-dropdown-container">
+          <button onClick={() => setSortDropdownVisible(!sortDropdownVisible)}>
+            Сортировка
+          </button>
+          {sortDropdownVisible && (
+            <div className="sort-dropdown">
+              <button onClick={() => applySorting("priceAsc")}>По возрастанию цены</button>
+              <button onClick={() => applySorting("priceDesc")}>По убыванию цены</button>
+            </div>
+          )}
+        </div>
+
+        {/* Фильтры */}
         <button onClick={() => setFiltersVisible(!filtersVisible)}>Фильтры</button>
-        <button onClick={() => setSortVisible(!sortVisible)}>Сортировка</button>
+        {filtersVisible && (
+          <div className="filters">
+            <label>
+              Максимальная цена:
+              <input
+                type="number"
+                name="maxPrice"
+                value={filterCriteria.maxPrice}
+                onChange={handleFilterChange}
+              />
+            </label>
+            <label>
+              Минимальный вес (г):
+              <input
+                type="number"
+                name="minWeight"
+                value={filterCriteria.minWeight}
+                onChange={handleFilterChange}
+              />
+            </label>
+            <button onClick={applyFilters}>Применить</button>
+          </div>
+        )}
       </div>
 
       {/* Раздел "Блюда" */}
       <h2>Блюда</h2>
       <div className="dishes">
-        {dishes.length === 0 ? (
+        {loading ? (
           <p>Загрузка блюд...</p>
+        ) : filteredDishes.length === 0 ? (
+          <p>Блюда не найдены.</p>
         ) : (
-          dishes.map((dish) => (
+          filteredDishes.map((dish) => (
             <div className="dish-card" key={dish.id}>
               <img
                 src={dish.imageUrl || "https://via.placeholder.com/150"}

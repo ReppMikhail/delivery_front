@@ -117,3 +117,34 @@ body {
     background-color: #218838;
   }
   
+  .sort-dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .sort-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 150%;
+  }
+  
+  .sort-dropdown button {
+    display: block;
+    padding: 8px 12px;
+    width: 150%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .sort-dropdown button:hover {
+    background-color: #f1f1f1;
+  }
+  
