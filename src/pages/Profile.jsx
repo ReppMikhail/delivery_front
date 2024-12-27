@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import "./Profile.css";
+import "./Profile.css";
 
 const initialUserData = {
   fullName: "Иван Иванов",
