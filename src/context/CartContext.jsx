@@ -42,8 +42,26 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const clearCart = () => {
+    setCartItems([]); // Очищаем весь массив
+  };
+
+  const deleteFromCart = (id) => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== id) // Удаляем полностью элемент с указанным id
+    );
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        deleteFromCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
