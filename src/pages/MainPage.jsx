@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MainPage.css";
 import { fetchDishes } from "../http/authService";
+import { useCart } from "../context/CartContext";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
+  const { cartItems, addToCart, removeFromCart } = useCart();
   const [dishes, setDishes] = useState([]);
   const [filteredDishes, setFilteredDishes] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
@@ -82,6 +84,11 @@ const MainPage = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const getCartItemQuantity = (id) => {
+    const item = cartItems.find((cartItem) => cartItem.id === id);
+    return item ? item.quantity : 0;
   };
 
   return (
@@ -185,24 +192,37 @@ const MainPage = () => {
         ) : filteredDishes.length === 0 ? (
           <p>Блюда не найдены.</p>
         ) : (
-          filteredDishes.map((dish) => (
-            <div className="dish-card" key={dish.id}>
-              <img
-                src={dish.imageUrl || "https://via.placeholder.com/150"}
-                alt={dish.name}
-                className="dish-image"
-              />
-              <h3 className="dish-name">{dish.name}</h3>
-              <p className="dish-weight">Вес: {dish.weight} г</p>
-              <p className="dish-ingredients">
-                {dish.ingredients.map((ingredient) => ingredient.name).join(", ")}
-              </p>
-              <div className="dish-footer">
-                <span className="dish-price">{dish.price} руб</span>
-                <button className="add-to-cart">+</button>
+          filteredDishes.map((dish) => {
+            const quantity = getCartItemQuantity(dish.id);
+            return (
+              <div className="dish-card" key={dish.id}>
+                <img
+                  src={dish.imageUrl || "https://via.placeholder.com/150"}
+                  alt={dish.name}
+                  className="dish-image"
+                />
+                <h3 className="dish-name">{dish.name}</h3>
+                <p className="dish-weight">Вес: {dish.weight} г</p>
+                <p className="dish-ingredients">
+                  {dish.ingredients.map((ingredient) => ingredient.name).join(", ")}
+                </p>
+                <div className="dish-footer">
+                  <span className="dish-price">{dish.price} руб</span>
+                  <div className="dish-cart-actions">
+                    {quantity > 0 ? (
+                      <>
+                        <button onClick={() => removeFromCart(dish.id)}>-</button>
+                        <span>{quantity}</span>
+                        <button onClick={() => addToCart(dish)}>+</button>
+                      </>
+                    ) : (
+                      <button onClick={() => addToCart(dish)}>Добавить</button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

@@ -1,37 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CartPage.css";
-
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Хачапури по-аджарски",
-    weight: 400,
-    price: 425,
-    quantity: 1,
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Ланч низкокалорийный",
-    weight: 500,
-    price: 525,
-    quantity: 2,
-    imageUrl: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Хинкали жареные",
-    weight: 600,
-    price: 115,
-    quantity: 6,
-    imageUrl: "https://via.placeholder.com/150",
-  },
-];
+import { useCart } from "../context/CartContext";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, setCartItems } = useCart();
 
   const handleIncreaseQuantity = (id) => {
     setCartItems((prevItems) =>
