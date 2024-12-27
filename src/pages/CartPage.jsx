@@ -1,40 +1,66 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./CartPage.css";
 import { useCart } from "../context/CartContext";
+import { createOrder } from "../http/orderService"; // Импорт функции для создания заказа
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cartItems, setCartItems } = useCart();
+  const { cartItems, addToCart, removeFromCart, deleteFromCart, clearCart } = useCart();
 
-  const handleIncreaseQuantity = (id) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
+  const handleIncreaseQuantity = (item) => {
+    addToCart(item);
   };
 
   const handleDecreaseQuantity = (id) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
+    removeFromCart(id);
   };
 
   const handleRemoveItem = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    deleteFromCart(id);
   };
 
-  const handlePlaceOrder = () => {
-    // Отправка заказа менеджеру (эмуляция)
-    console.log("Order placed:", cartItems);
-    alert("Ваш заказ оформлен и отправлен менеджеру!");
-    setCartItems([]); // Очистка корзины после оформления заказа
+  const handlePlaceOrder = async () => {
+    try {
+      // Получение данных пользователя из localStorage
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const customerId = authData?.id; // Извлечение customerId из сохранённых данных
+  
+      if (!customerId) {
+        alert("Не удалось определить пользователя. Войдите в аккаунт.");
+        return;
+      }
+  
+      // Подготовка данных для отправки заказа
+      const orderData = {
+        customerId, // ID клиента
+        status: "в обработке", // Начальный статус заказа
+        totalPrice: cartItems.reduce(
+          (sum, item) => sum + item.quantity * item.price,
+          0
+        ),
+        paymentMethod: "Карта", // Или другой способ оплаты
+        paymentStatus: "Не оплачено",
+        orderItems: cartItems.map((item) => ({
+          menuItem: { id: item.id }, // ID позиции из меню
+          quantity: item.quantity,
+          priceAtOrderTime: item.price,
+        })),
+        deliveryAddress: "Адрес доставки клиента", // Укажите логическое значение, как адрес по умолчанию
+      };
+  
+      // Отправка заказа через orderService
+      const createdOrder = await createOrder(orderData);
+  
+      alert(`Ваш заказ оформлен! Номер заказа: ${createdOrder.id}`);
+      clearCart(); // Очищаем корзину после успешного оформления
+      navigate("/main"); // Перенаправляем пользователя на главную страницу
+    } catch (error) {
+      console.error("Ошибка при оформлении заказа:", error);
+      alert("Не удалось оформить заказ. Попробуйте снова.");
+    }
   };
+  
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce(
@@ -73,7 +99,7 @@ const CartPage = () => {
             <div className="cart-item-quantity">
               <button onClick={() => handleDecreaseQuantity(item.id)}>-</button>
               <span>{item.quantity} шт</span>
-              <button onClick={() => handleIncreaseQuantity(item.id)}>+</button>
+              <button onClick={() => handleIncreaseQuantity(item)}>+</button>
             </div>
             <div className="cart-item-total">
               {item.price * item.quantity} ₽

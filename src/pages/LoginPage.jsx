@@ -46,36 +46,6 @@ function LoginPage() {
     }
   };
 
-  // const handleLogin = async () => {
-  //   if (login && password) {
-  //     try {
-  //       const userData = { username: login, password };
-  //       const response = await loginUser(userData);
-        
-  //       console.log("Успешный вход:", response);
-  
-  //       // Предположим, роль пользователя приходит в ответе
-  //       const { role } = response.data;
-  //       localStorage.setItem("role", role); // Сохранение роли пользователя
-  //       localStorage.setItem("token", response.data.token); // Сохранение токена (опционально)
-  
-  //       alert("Вы успешно вошли!");
-  
-  //       // Перенаправление в зависимости от роли
-  //       if (role === "manager") {
-  //         navigate("/manager");
-  //       } else {
-  //         navigate("/"); // Другие роли
-  //       }
-  //     } catch (error) {
-  //       console.error("Ошибка авторизации:", error);
-  //       alert(error.message || "Ошибка входа. Проверьте логин и пароль.");
-  //     }
-  //   } else {
-  //     alert("Введите логин и пароль!");
-  //   }
-  // };
-
   const goToRegister = () => {
     navigate("/register");
   };
