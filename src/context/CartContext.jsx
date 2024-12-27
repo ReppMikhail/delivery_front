@@ -1,13 +1,23 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    // Инициализация корзины из localStorage
+    const savedCart = localStorage.getItem("cartItems");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Сохраняем корзину в localStorage при каждом изменении
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (dish) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === dish.id);
+
       if (existingItem) {
         return prevItems.map((item) =>
           item.id === dish.id
@@ -15,6 +25,7 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
+
       return [...prevItems, { ...dish, quantity: 1 }];
     });
   };
@@ -27,12 +38,12 @@ export const CartProvider = ({ children }) => {
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
-        .filter((item) => item.quantity > 0) // Убираем товары с количеством <= 0
+        .filter((item) => item.quantity > 0) // Удаляем товары с количеством <= 0
     );
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, setCartItems }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
       {children}
     </CartContext.Provider>
   );
