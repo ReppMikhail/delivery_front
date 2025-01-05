@@ -32,31 +32,17 @@
 
 .content {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1;
   overflow-y: auto;
   gap: 20px;
   padding: 20px;
 }
 
-.left-column {
-  flex: 1; /* Левая колонка будет занимать оставшееся пространство */
-  overflow-y: auto;
-}
-
-.right-column {
-  flex: 0 0 50%; /* Фиксированная ширина 50% */
-  max-width: 50%; /* Устанавливаем максимальную ширину в 50% */
-  background-color: #f4f4f4;
-  padding: 20px;
-  border-left: 1px solid #e0e0e0;
-  overflow-y: auto;
-}
-
 .orders-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr); /* Три карточки в строке */
+  gap: 20px; /* Расстояние между карточками */
   padding: 0;
 }
 
