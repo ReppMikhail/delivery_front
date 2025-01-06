@@ -50,7 +50,16 @@
   background-color: #ffffff;
   border-radius: 10px;
   padding: 15px;
+  padding-top: 10px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-card>h3 {
+  text-align: center;
+}
+
+.order-card>h3 {
+  margin-top: 0px;
 }
 
 .buttons {
@@ -59,37 +68,44 @@
   margin-top: 10px;
 }
 
-.accept-button {
-  background-color: #00c853;
+.complete-button {
+  background-color: #66bb6a; /* Слегка зелёный цвет */
   color: #fff;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
+  border-radius: 20px; /* Закруглённые края */
+  padding: 10px 50px; /* Увеличиваем ширину кнопки */
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.complete-button:hover {
+  background-color: #43a047; /* Более тёмный зелёный при наведении */
 }
 
 .reject-button {
   background-color: #d32f2f;
   color: #fff;
   border: none;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 10px 80px; /* Увеличиваем ширину кнопки */
+  border-radius: 10px;
   cursor: pointer;
+  display: block; /* Чтобы кнопка заняла всю доступную ширину контейнера */
+  margin: 20px auto 0px; /* Центрирование по горизонтали */
 }
 
-.current-order {
-  background-color: #ffffff;
-  padding: 20px;
-  border-left: 1px solid #e0e0e0;
+.cancel-button {
+  background-color: #ef5350; /* Слегка красный цвет */
+  color: #fff;
+  border: none;
+  padding: 10px 50px; /* Увеличиваем ширину кнопки */
+  border-radius: 20px; /* Закруглённые края */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: auto; /* Прижимаем кнопку к правому краю */
 }
 
-.textarea {
-  width: 100%;
-  height: 80px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 15px;
+.cancel-button:hover {
+  background-color: #d32f2f; /* Более тёмный красный при наведении */
 }
 
 .arrow-buttons {
@@ -97,3 +113,14 @@
   justify-content: space-between;
   margin-bottom: 15px;
 }
+
+.end-delivery-button {
+  background-color: #00c853;
+  color: #fff;
+  border: none;
+  padding: 10px 50px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+

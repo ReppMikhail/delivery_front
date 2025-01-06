@@ -9,9 +9,10 @@ function CourierPage() {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [inProgressOrders, setInProgressOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isOnDelivery, setIsOnDelivery] = useState(false);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchOrdersAndDeliveryStatus = async () => {
       try {
         setLoading(true);
 
@@ -19,28 +20,69 @@ function CourierPage() {
         const courierId = authData?.id;
         if (!courierId) throw new Error("Courier ID not found in localStorage");
 
+        // Получение заказов
         const fetchedOrders = await getOrdersByCustomerId(4); // Замените на нужный customerId, если нужно
-
-        // Разделяем заказы на два списка в зависимости от их статуса
         const filteredPendingOrders = fetchedOrders.filter(
           (order) => order.status === "назначен курьер"
         );
-
         const filteredInProgressOrders = fetchedOrders.filter(
           (order) => order.status === "в пути"
         );
 
         setPendingOrders(filteredPendingOrders);
         setInProgressOrders(filteredInProgressOrders);
+
+        // Проверка статуса доставки
+        const [couriersOnShiftResponse, couriersNotOnDeliveryResponse] =
+          await Promise.all([
+            axios.get("http://localhost:8080/api/v1/couriers/all-on-shift"),
+            axios.get(
+              "http://localhost:8080/api/v1/couriers/all-on-shift-and-not-on-delivery"
+            ),
+          ]);
+
+        const couriersOnShift = couriersOnShiftResponse.data || [];
+        const couriersNotOnDelivery = couriersNotOnDeliveryResponse.data || [];
+
+        const isCurrentlyOnDelivery =
+          couriersOnShift.some((courier) => courier.id === courierId) &&
+          !couriersNotOnDelivery.some((courier) => courier.id === courierId);
+
+        setIsOnDelivery(isCurrentlyOnDelivery);
       } catch (error) {
-        console.error("Ошибка загрузки заказов:", error);
+        console.error("Ошибка загрузки данных:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrders();
+    fetchOrdersAndDeliveryStatus();
   }, []);
+
+  const handleEndDelivery = async () => {
+    try {
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const courierId = authData?.id;
+      const token = authData?.accessToken;
+      if (!courierId || !token)
+        throw new Error("Токен авторизации отсутствует");
+
+      await axios.put(
+        `http://localhost:8080/api/v1/couriers/${courierId}/end-delivery`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Курьер завершил доставку.");
+      setIsOnDelivery(false); // Обновляем статус
+    } catch (error) {
+      console.error("Ошибка завершения доставки:", error.message);
+    }
+  };
 
   const handleRejectOrder = async (orderId) => {
     try {
@@ -59,7 +101,9 @@ function CourierPage() {
       );
 
       setPendingOrders(pendingOrders.filter((order) => order.id !== orderId));
-      console.log(`Заказ ${orderId} отклонён и переведён в статус "готовится".`);
+      console.log(
+        `Заказ ${orderId} отклонён и переведён в статус "готовится".`
+      );
     } catch (error) {
       console.error(`Ошибка при обновлении заказа ${orderId}:`, error.message);
     }
@@ -82,8 +126,12 @@ function CourierPage() {
         }
       );
 
-      setInProgressOrders(inProgressOrders.filter((order) => order.id !== orderId));
-      console.log(`Заказ ${orderId} завершён и переведён в статус "Доставлен".`);
+      setInProgressOrders(
+        inProgressOrders.filter((order) => order.id !== orderId)
+      );
+      console.log(
+        `Заказ ${orderId} завершён и переведён в статус "Доставлен".`
+      );
     } catch (error) {
       console.error(`Ошибка при завершении заказа ${orderId}:`, error.message);
     }
@@ -105,7 +153,9 @@ function CourierPage() {
         }
       );
 
-      setInProgressOrders(inProgressOrders.filter((order) => order.id !== orderId));
+      setInProgressOrders(
+        inProgressOrders.filter((order) => order.id !== orderId)
+      );
       console.log(`Заказ ${orderId} отменён и переведён в статус "готовится".`);
     } catch (error) {
       console.error(`Ошибка при отмене заказа ${orderId}:`, error.message);
@@ -173,21 +223,30 @@ function CourierPage() {
                   </p>
                   <p>Сумма: {order.totalPrice.toFixed(2)} ₽</p>
                   <p>Адрес доставки: {order.deliveryAddress}</p>
-                  <button
-                    className="complete-button"
-                    onClick={() => handleCompleteOrder(order.id)}
-                  >
-                    Завершить
-                  </button>
-                  <button
-                    className="cancel-button"
-                    onClick={() => handleCancelOrder(order.id)}
-                  >
-                    Отменить
-                  </button>
+                  <div className="buttons">
+                    <button
+                      className="complete-button"
+                      onClick={() => handleCompleteOrder(order.id)}
+                    >
+                      Завершить
+                    </button>
+                    <button
+                      className="cancel-button"
+                      onClick={() => handleCancelOrder(order.id)}
+                    >
+                      Отменить
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
+          </div>
+        ) : isOnDelivery ? (
+          <div>
+            <p>Нет доступных заказов.</p>
+            <button className="end-delivery-button" onClick={handleEndDelivery}>
+              Завершить доставку
+            </button>
           </div>
         ) : (
           <p>Нет доступных заказов.</p>
