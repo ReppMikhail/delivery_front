@@ -77,6 +77,15 @@ button.accept {
   cursor: pointer;
 }
 
+button.assign{
+  background-color: #284dd1;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 button.reject {
   background-color: #f44336;
   color: white;
