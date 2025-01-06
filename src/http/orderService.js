@@ -75,7 +75,36 @@ export const getActualUserOrders = async () => {
 // Функция для отметки заказа как подготовленного
 export const markOrderPrepared = async (orderId) => {
   try {
-    const response = await axiosInstance.put(`${API_BASE_URL}/orders/${orderId}/prepared`);
+    const response = await axiosInstance.put(`${API_BASE_URL}/orders/${orderId}/prepare`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+export const getCouriersOnShift = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/all-on-shift`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+// Получение курьеров на смене и не занятых доставкой
+export const getCouriersOnShiftAndNotOnDelivery = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/all-on-shift-and-not-on-delivery`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+// Назначение курьера на заказ
+export const assignCourierToOrder = async (orderId, courierId) => {
+  try {
+    const response = await axiosInstance.put(`${API_BASE_URL}/couriers/${courierId}/take-order`, { id: orderId });
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : new Error("Network Error");

@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { getOrdersByCustomerId, markOrderPrepared } from "../http/orderService";
+import {
+  getOrdersByCustomerId,
+  markOrderPrepared,
+  getCouriersOnShift,
+  assignCourierToOrder,
+} from "../http/orderService";
 import "./ManagerPage.css";
 
 function ManagerPage() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
+  const [couriers, setCouriers] = useState([]);
+  const [assigningOrderId, setAssigningOrderId] = useState(null); // ID заказа, для которого назначаем курьера
   const userId = 4; // Замените на актуальный ID пользователя
 
   // Загрузка заказов
@@ -21,6 +28,7 @@ function ManagerPage() {
     fetchOrders();
   }, [userId]);
 
+  // Обработка принятия заказа
   const handleAcceptOrder = async (orderId) => {
     try {
       await markOrderPrepared(orderId);
@@ -32,6 +40,32 @@ function ManagerPage() {
       alert(`Заказ ${orderId} помечен как "готовится"`);
     } catch (err) {
       alert(err.message || "Ошибка при обновлении заказа");
+    }
+  };
+
+  // Загрузка доступных курьеров
+  const loadCouriers = async () => {
+    try {
+      const data = await getCouriersOnShift();
+      setCouriers(data);
+    } catch (err) {
+      alert(err.message || "Ошибка при загрузке списка курьеров");
+    }
+  };
+
+  // Обработка назначения курьера
+  const handleAssignCourier = async (orderId, courierId) => {
+    try {
+      await assignCourierToOrder(orderId, courierId);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, status: "Назначен курьер" } : order
+        )
+      );
+      setAssigningOrderId(null); // Скрыть выпадающий список
+      alert(`Курьер ${courierId} назначен на заказ ${orderId}`);
+    } catch (err) {
+      alert(err.message || "Ошибка при назначении курьера");
     }
   };
 
@@ -72,12 +106,45 @@ function ManagerPage() {
                 </div>
               </div>
               <div className="order-actions">
-                <button
-                  className="accept"
-                  onClick={() => handleAcceptOrder(order.id)}
-                >
-                  Принять
-                </button>
+                {order.status === "в обработке" && (
+                  <button
+                    className="accept"
+                    onClick={() => handleAcceptOrder(order.id)}
+                  >
+                    Принять
+                  </button>
+                )}
+                {order.status === "готовится" && (
+                  assigningOrderId === order.id ? (
+                    <div>
+                      <select
+                        onChange={(e) =>
+                          handleAssignCourier(order.id, e.target.value)
+                        }
+                      >
+                        <option value="">Выберите курьера</option>
+                        {couriers.map((courier) => (
+                          <option key={courier.id} value={courier.id}>
+                            {courier.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button onClick={() => setAssigningOrderId(null)}>
+                        Отмена
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="assign"
+                      onClick={async () => {
+                        setAssigningOrderId(order.id);
+                        await loadCouriers();
+                      }}
+                    >
+                      Назначить курьера
+                    </button>
+                  )
+                )}
               </div>
             </div>
           ))
