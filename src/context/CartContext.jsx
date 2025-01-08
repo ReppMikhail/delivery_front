@@ -52,6 +52,16 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0'); // ДД
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // ММ (месяцы начинаются с 0)
+    const year = date.getFullYear(); // ГГГГ
+    const hours = String(date.getHours()).padStart(2, '0'); // ЧЧ
+    const minutes = String(date.getMinutes()).padStart(2, '0'); // ММ
+  
+    return `${day}.${month}.${year} ${hours}:${minutes}`; // Форматируем строку
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -60,6 +70,7 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         deleteFromCart,
+        formatDate
       }}
     >
       {children}

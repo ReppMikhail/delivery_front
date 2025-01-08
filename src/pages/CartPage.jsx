@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./CartPage.css";
 import { useCart } from "../context/CartContext";
-import { createOrder } from "../http/orderService"; // Импорт функции для создания заказа
+import { createOrder, getUserByIdNoOrders } from "../http/orderService"; // Импорт необходимых функций
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cartItems, addToCart, removeFromCart, deleteFromCart, clearCart } = useCart();
+  const { cartItems, addToCart, removeFromCart, deleteFromCart, clearCart, formatDate } = useCart();
 
   const handleIncreaseQuantity = (item) => {
     addToCart(item);
@@ -20,38 +20,58 @@ const CartPage = () => {
     deleteFromCart(id);
   };
 
+  const handleFormatDate = (date) => {
+    formatDate(date);
+  };
+
+  
+
   const handlePlaceOrder = async () => {
     try {
       // Получение данных пользователя из localStorage
       const authData = JSON.parse(localStorage.getItem("authData"));
       const customerId = authData?.id; // Извлечение customerId из сохранённых данных
-  
+
       if (!customerId) {
         alert("Не удалось определить пользователя. Войдите в аккаунт.");
         return;
       }
-  
+
+      // Получение данных о пользователе (включая адрес)
+      const userData = await getUserByIdNoOrders(customerId);
+
+      if (!userData || !userData.address) {
+        alert("Не удалось получить адрес пользователя. Укажите адрес в профиле.");
+        return;
+      }
+
+      // Получаем текущее время
+      // const currentDate = new Date();
+      // const orderTime = handleFormatDate(currentDate);
+
+      const orderTime = new Date();
+
       // Подготовка данных для отправки заказа
       const orderData = {
         customerId, // ID клиента
-        status: "в обработке", // Начальный статус заказа
         totalPrice: cartItems.reduce(
           (sum, item) => sum + item.quantity * item.price,
           0
         ),
-        paymentMethod: "Карта", // Или другой способ оплаты
+        paymentMethod: "Наличные", // Или другой способ оплаты
         paymentStatus: "Не оплачено",
         orderItems: cartItems.map((item) => ({
           menuItem: { id: item.id }, // ID позиции из меню
           quantity: item.quantity,
           priceAtOrderTime: item.price,
         })),
-        deliveryAddress: "Адрес доставки клиента", // Укажите логическое значение, как адрес по умолчанию
+        deliveryAddress: userData.address, // Адрес доставки клиента из базы данных
+        orderTime: orderTime,
       };
-  
+
       // Отправка заказа через orderService
       const createdOrder = await createOrder(orderData);
-  
+
       alert(`Ваш заказ оформлен! Номер заказа: ${createdOrder.id}`);
       clearCart(); // Очищаем корзину после успешного оформления
       navigate("/main"); // Перенаправляем пользователя на главную страницу
@@ -60,7 +80,6 @@ const CartPage = () => {
       alert("Не удалось оформить заказ. Попробуйте снова.");
     }
   };
-  
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cartItems.reduce(

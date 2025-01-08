@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  getOrdersByCustomerId,
+  getAllOrders,
   markOrderPrepared,
   getCouriersOnShift,
   assignCourierToOrder,
@@ -12,13 +12,12 @@ function ManagerPage() {
   const [error, setError] = useState(null);
   const [couriers, setCouriers] = useState([]);
   const [assigningOrderId, setAssigningOrderId] = useState(null); // ID заказа, для которого назначаем курьера
-  const userId = 5; // Замените на актуальный ID пользователя
 
   // Загрузка заказов
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await getOrdersByCustomerId(userId);
+        const data = await getAllOrders();
         setOrders(data);
       } catch (err) {
         setError(err.message || "Ошибка при загрузке заказов");
@@ -26,7 +25,7 @@ function ManagerPage() {
     };
 
     fetchOrders();
-  }, [userId]);
+  }, []); // Добавил зависимость, чтобы запрос выполнялся только при первом рендере
 
   // Обработка принятия заказа
   const handleAcceptOrder = async (orderId) => {
@@ -103,6 +102,8 @@ function ManagerPage() {
                   <span>Адрес: {order.deliveryAddress}</span>
                   <span>Оплата: {order.paymentMethod}</span>
                   <span>Статус оплаты: {order.paymentStatus}</span>
+                  <span>Время оформления: {order.orderTime || "Не указано"}</span>
+                  {/* <span>Заказчик: {order.customerName || "Имя не указано"}</span> */}
                 </div>
               </div>
               <div className="order-actions">

@@ -21,6 +21,15 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+// Функция для получения данных о пользователе по ID (без заказов)
+export const getUserByIdNoOrders = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/users/${userId}/no-orders`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
 
 // Функция для создания заказа
 export const createOrder = async (orderData) => {
@@ -41,17 +50,6 @@ export const getAllOrders = async () => {
       throw error.response ? error.response.data : new Error("Network Error");
     }
   };
-  
-
-// Функция для получения всех заказов пользователя
-export const getAllUserOrders = async () => {
-  try {
-    const response = await axiosInstance.get(`${API_BASE_URL}/orders/user-all`);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
-  }
-};
 
 export const getOrdersByCustomerId = async (customerId) => {
     try {
