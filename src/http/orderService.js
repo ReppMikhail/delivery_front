@@ -21,6 +21,7 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+
 // Функция для получения данных о пользователе по ID (без заказов)
 export const getUserByIdNoOrders = async (userId) => {
   try {
