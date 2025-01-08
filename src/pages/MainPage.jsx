@@ -14,6 +14,7 @@ const MainPage = () => {
   const [loading, setLoading] = useState(false);
   const [sortDropdownVisible, setSortDropdownVisible] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false); // Состояние для выпадающего списка "О нас"
   const [filterCriteria, setFilterCriteria] = useState({
     maxPrice: "",
     minWeight: "",
@@ -96,12 +97,23 @@ const MainPage = () => {
       <header className="navbar">
         <div className="navbar-left">
           <button onClick={() => navigate("/main")}>Главная</button>
-          <button onClick={() => navigate("/about")}>О нас</button>
+
+          {/* Выпадающее меню "О нас" */}
+          
+            <button onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}>
+              О нас
+            </button>
+            {aboutDropdownVisible && (
+              <div className="dropdown-popup">
+                <button onClick={() => navigate("/about/system")}>О системе</button>
+                <button onClick={() => navigate("/about/developers")}>О разработчиках</button>
+              </div>
+            )}
           <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
-          <button onClick={() => navigate("/profile")} className="profile-button">Личный кабинет</button>
-          <button onClick={() => navigate("/cart")} className="cart-button">Корзина</button>
+          <button onClick={() => navigate("/profile")}>Личный кабинет</button>
+          <button onClick={() => navigate("/cart")}>Корзина</button>
         </div>
       </header>
 

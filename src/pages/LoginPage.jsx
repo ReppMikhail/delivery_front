@@ -27,7 +27,9 @@ function LoginPage() {
         console.log("Роль пользователя:", roles);
   
         // Перенаправление в зависимости от роли
-        if (roles.includes("ROLE_MANAGER")) {
+        if (roles.includes("ROLE_ADMIN")) {
+          navigate("/admin");
+        } else if (roles.includes("ROLE_MANAGER")) {
           navigate("/manager");
         } else if (roles.includes("ROLE_COURIER")) {
           navigate("/courier");

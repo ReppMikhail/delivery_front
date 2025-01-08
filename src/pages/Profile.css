@@ -30,15 +30,6 @@ body {
     margin-right: 15px;
   }
   
-  .navbar-right .cart-button {
-    background-color: #ff5722;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
   .navbar button:hover {
     color: #ff5722;
   }
