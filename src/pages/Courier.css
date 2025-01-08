@@ -47,19 +47,31 @@
 }
 
 .order-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Разделяем содержимое на верх и низ */
   background-color: #ffffff;
   border-radius: 10px;
   padding: 15px;
   padding-top: 10px;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  height: 100%; /* Все карточки будут одинаковой высоты */
 }
 
-.order-card>h3 {
+.order-card > h3 {
   text-align: center;
+  margin-top: 0px;
 }
 
-.order-card>h3 {
-  margin-top: 0px;
+.order-items {
+  margin-bottom: 15px;
+}
+
+.divider-line {
+  border: none; /* Убирает стандартный стиль hr */
+  border-top: 1px solid #ccc; /* Тонкая линия */
+  margin: 10px 0; /* Отступы сверху и снизу */
+  width: 100%; /* Линия занимает всю ширину */
 }
 
 .buttons {
@@ -67,6 +79,28 @@
   justify-content: space-between;
   margin-top: 10px;
 }
+
+.order-card-content {
+  flex-grow: 1; /* Расширяем основное содержимое */
+}
+
+.order-card-footer {
+  margin-top: auto; /* Прижимаем footer к низу */
+}
+
+.order-details-row {
+  display: flex;
+  justify-content: space-between; /* Равномерное расстояние между элементами */
+  align-items: center; /* Выравнивание по вертикали */
+  margin-top: 10px; /* Отступ сверху */
+}
+
+.order-details-row p {
+  margin: 0; /* Убираем лишние отступы */
+  flex: 1; /* Все элементы занимают равное пространство */
+  text-align: center; /* Текст по центру */
+}
+
 
 .complete-button {
   background-color: #66bb6a; /* Слегка зелёный цвет */

@@ -23,21 +23,29 @@ function CourierPage() {
         // Получение заказов
         const fetchedOrders = await getOrdersByCustomerId(4); // Замените на нужный customerId, если нужно
         const filteredPendingOrders = fetchedOrders.filter(
-          (order) => order.status === "назначен курьер"
+          (order) => order.status === "назначен курьер" // && courierId == order.courierId
         );
         const filteredInProgressOrders = fetchedOrders.filter(
-          (order) => order.status === "в пути"
+          (order) => order.status === "в пути" // && courierId == order.courierId
         );
 
         setPendingOrders(filteredPendingOrders);
         setInProgressOrders(filteredInProgressOrders);
 
         // Проверка статуса доставки
+        const token = authData?.accessToken;
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+
         const [couriersOnShiftResponse, couriersNotOnDeliveryResponse] =
           await Promise.all([
-            axios.get("http://localhost:8080/api/v1/couriers/all-on-shift"),
+            axios.get("http://localhost:8080/api/v1/couriers/all-on-shift", {
+              headers,
+            }),
             axios.get(
-              "http://localhost:8080/api/v1/couriers/all-on-shift-and-not-on-delivery"
+              "http://localhost:8080/api/v1/couriers/all-on-shift-and-not-on-delivery",
+              { headers }
             ),
           ]);
 
@@ -162,6 +170,11 @@ function CourierPage() {
     }
   };
 
+  const formatOrderTime = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  };
+
   return (
     <div className="courier-page">
       <header className="navbar">
@@ -184,27 +197,42 @@ function CourierPage() {
               {pendingOrders.map((order) => (
                 <div key={order.id} className="order-card">
                   <h3>Заказ #{order.id}</h3>
-                  <p>
-                    {order.orderItems
-                      .map((item) => `${item.menuItem.name} x ${item.quantity}`)
-                      .join(", ")}
-                  </p>
-                  <p>
-                    Общий вес:{" "}
-                    {order.orderItems.reduce(
-                      (acc, item) => acc + item.menuItem.weight * item.quantity,
-                      0
-                    )}{" "}
-                    г
-                  </p>
-                  <p>Сумма: {order.totalPrice.toFixed(2)} ₽</p>
-                  <p>Адрес доставки: {order.deliveryAddress}</p>
-                  <button
-                    className="reject-button"
-                    onClick={() => handleRejectOrder(order.id)}
-                  >
-                    Отклонить
-                  </button>
+                  {/* Основное содержимое */}
+                  <div className="order-card-content">
+                    <p>
+                      {order.orderItems.map((item) => (
+                        <div key={item.menuItem.id} className="order-items">
+                          {item.menuItem.name} x {item.quantity}
+                          <br />
+                        </div>
+                      ))}
+                    </p>
+                  </div>
+
+                  {/* Футер карточки */}
+                  <div className="order-card-footer">
+                    <hr className="divider-line" />
+                    <div className="order-details-row">
+                      <p>{order.totalPrice.toFixed(2)} ₽</p>
+                      <p>{formatOrderTime(order.orderTime)}</p>
+                      <p>
+                        {order.orderItems.reduce(
+                          (acc, item) =>
+                            acc + item.menuItem.weight * item.quantity,
+                          0
+                        )}
+                        г
+                      </p>
+                    </div>
+
+                    <p>Адрес доставки: {order.deliveryAddress}</p>
+                    <button
+                      className="reject-button"
+                      onClick={() => handleRejectOrder(order.id)}
+                    >
+                      Отклонить
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -216,26 +244,50 @@ function CourierPage() {
               {inProgressOrders.map((order) => (
                 <div key={order.id} className="order-card">
                   <h3>Заказ #{order.id}</h3>
-                  <p>
-                    {order.orderItems
-                      .map((item) => `${item.menuItem.name} x ${item.quantity}`)
-                      .join(", ")}
-                  </p>
-                  <p>Сумма: {order.totalPrice.toFixed(2)} ₽</p>
-                  <p>Адрес доставки: {order.deliveryAddress}</p>
-                  <div className="buttons">
-                    <button
-                      className="complete-button"
-                      onClick={() => handleCompleteOrder(order.id)}
-                    >
-                      Завершить
-                    </button>
-                    <button
-                      className="cancel-button"
-                      onClick={() => handleCancelOrder(order.id)}
-                    >
-                      Отменить
-                    </button>
+
+                  {/* Основное содержимое */}
+                  <div className="order-card-content">
+                    <p>
+                      {order.orderItems.map((item) => (
+                        <div key={item.menuItem.id} className="order-items">
+                          {item.menuItem.name} x {item.quantity}
+                          <br />
+                        </div>
+                      ))}
+                    </p>
+                  </div>
+
+                  {/* Футер карточки */}
+                  <div className="order-card-footer">
+                    <hr className="divider-line" />
+                    <div className="order-details-row">
+                      <p>{order.totalPrice.toFixed(2)} ₽</p>
+                      <p>{formatOrderTime(order.orderTime)}</p>
+                      <p>
+                        {order.orderItems.reduce(
+                          (acc, item) =>
+                            acc + item.menuItem.weight * item.quantity,
+                          0
+                        )}
+                        г
+                      </p>
+                    </div>
+
+                    <p>Адрес доставки: {order.deliveryAddress}</p>
+                    <div className="buttons">
+                      <button
+                        className="complete-button"
+                        onClick={() => handleCompleteOrder(order.id)}
+                      >
+                        Завершить
+                      </button>
+                      <button
+                        className="cancel-button"
+                        onClick={() => handleCancelOrder(order.id)}
+                      >
+                        Отменить
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
