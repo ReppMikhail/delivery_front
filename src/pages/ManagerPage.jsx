@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
-  getOrdersByCustomerId,
+  getAllOrders,
   markOrderPrepared,
   getCouriersOnShift,
   assignCourierToOrder,
+  getCouriersOnShiftAndNotOnDelivery,
+  startCourierDelivery,
+  cancelOrder,
 } from "../http/orderService";
 import "./ManagerPage.css";
 
@@ -11,14 +14,14 @@ function ManagerPage() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [couriers, setCouriers] = useState([]);
-  const [assigningOrderId, setAssigningOrderId] = useState(null); // ID заказа, для которого назначаем курьера
-  const userId = 5; // Замените на актуальный ID пользователя
+  const [assigningOrderId, setAssigningOrderId] = useState(null); // ID заказа для назначения курьера
+  const [selectedCourier, setSelectedCourier] = useState(null); // Выбранный курьер для всплывающего окна
 
   // Загрузка заказов
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await getOrdersByCustomerId(userId);
+        const data = await getAllOrders();
         setOrders(data);
       } catch (err) {
         setError(err.message || "Ошибка при загрузке заказов");
@@ -26,7 +29,7 @@ function ManagerPage() {
     };
 
     fetchOrders();
-  }, [userId]);
+  }, []);
 
   // Обработка принятия заказа
   const handleAcceptOrder = async (orderId) => {
@@ -37,16 +40,31 @@ function ManagerPage() {
           order.id === orderId ? { ...order, status: "готовится" } : order
         )
       );
-      alert(`Заказ ${orderId} помечен как "готовится"`);
+      alert(`Заказ ${orderId} помечен как \"готовится\"`);
     } catch (err) {
       alert(err.message || "Ошибка при обновлении заказа");
     }
   };
 
-  // Загрузка доступных курьеров
-  const loadCouriers = async () => {
+  // Обработка отмены заказа
+  const handleCancelOrder = async (orderId) => {
     try {
-      const data = await getCouriersOnShift();
+      await cancelOrder(orderId);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, status: "отменен" } : order
+        )
+      );
+      alert(`Заказ ${orderId} отменен`);
+    } catch (err) {
+      alert(err.message || "Ошибка при отмене заказа");
+    }
+  };
+
+  // Загрузка свободных курьеров
+  const loadAvailableCouriers = async () => {
+    try {
+      const data = await getCouriersOnShiftAndNotOnDelivery();
       setCouriers(data);
     } catch (err) {
       alert(err.message || "Ошибка при загрузке списка курьеров");
@@ -59,13 +77,30 @@ function ManagerPage() {
       await assignCourierToOrder(orderId, courierId);
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order.id === orderId ? { ...order, status: "Назначен курьер" } : order
+          order.id === orderId
+            ? { ...order, status: "назначен курьер", courierName: couriers.find(courier => courier.id === courierId)?.name }
+            : order
         )
       );
-      setAssigningOrderId(null); // Скрыть выпадающий список
+      setAssigningOrderId(null); // Закрыть всплывающее окно
       alert(`Курьер ${courierId} назначен на заказ ${orderId}`);
     } catch (err) {
       alert(err.message || "Ошибка при назначении курьера");
+    }
+  };
+
+  // Начало доставки
+  const handleStartDelivery = async (courierId, orderId) => {
+    try {
+      await startCourierDelivery(courierId);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, status: "в пути" } : order
+        )
+      );
+      alert(`Курьер ${courierId} начал доставку заказа ${orderId}`);
+    } catch (err) {
+      alert(err.message || "Ошибка при начале доставки");
     }
   };
 
@@ -83,7 +118,11 @@ function ManagerPage() {
                 <span>Заказ {order.id}</span>
                 <span
                   className={`status ${
-                    order.status === "Не назначен" ? "pending" : "assigned"
+                    order.status === "Не назначен"
+                      ? "pending"
+                      : order.status === "готовится"
+                      ? "assigned"
+                      : "busy"
                   }`}
                 >
                   {order.status}
@@ -103,34 +142,43 @@ function ManagerPage() {
                   <span>Адрес: {order.deliveryAddress}</span>
                   <span>Оплата: {order.paymentMethod}</span>
                   <span>Статус оплаты: {order.paymentStatus}</span>
+                  <span>Время оформления: {order.orderTime || "Не указано"}</span>
                 </div>
               </div>
               <div className="order-actions">
                 {order.status === "в обработке" && (
-                  <button
+                  <div >
+                    <button
                     className="accept"
                     onClick={() => handleAcceptOrder(order.id)}
                   >
                     Принять
                   </button>
+                  <button
+                  className="reject"
+                  onClick={() => handleCancelOrder(order.id)}
+                >
+                  Отменить
+                </button>
+                  </div>
                 )}
                 {order.status === "готовится" && (
                   assigningOrderId === order.id ? (
-                    <div>
-                      <select
-                        onChange={(e) =>
-                          handleAssignCourier(order.id, e.target.value)
-                        }
+                    <div className="couriers-popup">
+                      {couriers.map((courier) => (
+                        <div
+                          key={courier.id}
+                          className="courier-option"
+                          onClick={() => handleAssignCourier(order.id, courier.id)}
+                        >
+                          {courier.name}
+                        </div>
+                      ))}
+                      <button
+                        className="cancel-popup"
+                        onClick={() => setAssigningOrderId(null)}
                       >
-                        <option value="">Выберите курьера</option>
-                        {couriers.map((courier) => (
-                          <option key={courier.id} value={courier.id}>
-                            {courier.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button onClick={() => setAssigningOrderId(null)}>
-                        Отмена
+                        Закрыть
                       </button>
                     </div>
                   ) : (
@@ -138,12 +186,23 @@ function ManagerPage() {
                       className="assign"
                       onClick={async () => {
                         setAssigningOrderId(order.id);
-                        await loadCouriers();
+                        await loadAvailableCouriers();
                       }}
                     >
                       Назначить курьера
                     </button>
                   )
+                )}
+                {order.status === "назначен курьер" && (
+                  <>
+                    <span>Курьер: {order.courierName}</span>
+                    <button
+                      className="start-delivery"
+                      onClick={() => handleStartDelivery(order.courierId, order.id)}
+                    >
+                      Начать доставку
+                    </button>
+                  </>
                 )}
               </div>
             </div>

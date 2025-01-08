@@ -21,6 +21,15 @@ axiosInstance.interceptors.request.use((config) => {
   }
   return config;
 });
+// Функция для получения данных о пользователе по ID (без заказов)
+export const getUserByIdNoOrders = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/users/${userId}/no-orders`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
 
 // Функция для создания заказа
 export const createOrder = async (orderData) => {
@@ -41,17 +50,6 @@ export const getAllOrders = async () => {
       throw error.response ? error.response.data : new Error("Network Error");
     }
   };
-  
-
-// Функция для получения всех заказов пользователя
-export const getAllUserOrders = async () => {
-  try {
-    const response = await axiosInstance.get(`${API_BASE_URL}/orders/user-all`);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
-  }
-};
 
 export const getOrdersByCustomerId = async (customerId) => {
     try {
@@ -72,6 +70,17 @@ export const getActualUserOrders = async () => {
   }
 };
 
+// Отмена заказа
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await axiosInstance.put(`${API_BASE_URL}/orders/${orderId}/cancel`);
+    return response.data; // true или false
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+
 // Функция для отметки заказа как подготовленного
 export const markOrderPrepared = async (orderId) => {
   try {
@@ -82,6 +91,7 @@ export const markOrderPrepared = async (orderId) => {
   }
 };
 
+// Получение всех курьеров на смене
 export const getCouriersOnShift = async () => {
   try {
     const response = await axiosInstance.get(`${API_BASE_URL}/couriers/all-on-shift`);
@@ -104,7 +114,19 @@ export const getCouriersOnShiftAndNotOnDelivery = async () => {
 // Назначение курьера на заказ
 export const assignCourierToOrder = async (orderId, courierId) => {
   try {
-    const response = await axiosInstance.put(`${API_BASE_URL}/couriers/${courierId}/take-order`, { id: orderId });
+    const response = await axiosInstance.put(`${API_BASE_URL}/manager/${courierId}/take-order`, { id: orderId });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+// Начало доставки (курьер отправляется на доставку)
+export const startCourierDelivery = async (courierId) => {
+  try {
+    const response = await axiosInstance.put(
+      `${API_BASE_URL}/manager/${courierId}/go-delivery`
+    );
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : new Error("Network Error");
