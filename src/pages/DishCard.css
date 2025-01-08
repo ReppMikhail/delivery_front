@@ -1,0 +1,117 @@
+.dish-card-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+    border-radius: 10px;
+    width: 95%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }  
+  
+  .dish-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .dish-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .dish-category {
+    background: #d9b3ff;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+  }
+  
+  .dish-content {
+    margin-top: 10px;
+  }
+  
+  .dish-image-description {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #b0e1d163;
+  }
+  
+  .dish-image {
+    width: 150px; /* Уменьшаем ширину изображения */
+    height: 150px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  
+  .dish-description {
+    flex: 1;
+  }
+  
+  .dish-description h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .dish-description p {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .dish-details p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
+  
+  .dish-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .dish-quantity-control {
+    display: flex;
+    align-items: center;
+  }
+  
+  .quantity-button {
+    background: #ddd;
+    border: none;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .quantity {
+    margin: 0 10px;
+    font-size: 14px;
+  }
+  
+  .dish-price {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .add-to-cart {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
