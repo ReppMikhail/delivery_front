@@ -12,7 +12,7 @@ function ManagerPage() {
   const [error, setError] = useState(null);
   const [couriers, setCouriers] = useState([]);
   const [assigningOrderId, setAssigningOrderId] = useState(null); // ID заказа, для которого назначаем курьера
-  const userId = 4; // Замените на актуальный ID пользователя
+  const userId = 5; // Замените на актуальный ID пользователя
 
   // Загрузка заказов
   useEffect(() => {

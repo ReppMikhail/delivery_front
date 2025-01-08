@@ -148,3 +148,25 @@ body {
     background-color: #f1f1f1;
   }
   
+  .dropdown-popup {
+    position: absolute;
+    top: 50px; /* Отступ вниз от кнопки "О нас" */
+    left: 100px;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dropdown-popup button {
+    background: none;
+    border: none;
+    padding: 10px 10px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+
+  

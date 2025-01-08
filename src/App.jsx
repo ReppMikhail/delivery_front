@@ -47,13 +47,12 @@ function App() {
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/main" element={<MainPage />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/cart" element={<CartPage />} />
-      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin" element={<ProtectedRoute role="ROLE_ADMIN"><AdminPage /></ProtectedRoute>} />
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
       <Route path="/courier" element={<ProtectedRoute role="ROLE_COURIER"><CourierPage /></ProtectedRoute>} />
-      {/* <Route path="/admin" element={<ProtectedRoute role="ROLE_ADMIN"><AdminPage /></ProtectedRoute>} /> */}
+      <Route path="/main" element={<ProtectedRoute role="ROLE_CUSTOMER"><MainPage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute role="ROLE_CUSTOMER"><Profile /></ProtectedRoute>} />
+      <Route path="/cart" element={<ProtectedRoute role="ROLE_CUSTOMER"><CartPage /></ProtectedRoute>} />
     </Routes>
   );
 }

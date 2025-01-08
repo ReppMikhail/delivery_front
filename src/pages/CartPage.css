@@ -3,7 +3,6 @@
 /* Общие стили для страницы */
 .cart-page {
     font-family: Arial, sans-serif;
-    padding: 20px;
     background-color: #f8f8f8;
   }
   
@@ -31,13 +30,6 @@
   .navbar-left span {
     font-size: 16px;
     color: #666;
-  }
-  
-  .profile-button {
-    background-color: #f5f5f5;
-    border-radius: 4px;
-    padding: 5px 15px;
-    font-size: 16px;
   }
   
   /* Заголовок корзины */

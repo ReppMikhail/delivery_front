@@ -60,12 +60,8 @@ const Profile = () => {
           <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
-          <button
-            onClick={() => navigate("/cart")}
-            className="cart-button"
-          >
-            Корзина
-          </button>
+          <button onClick={() => navigate("/profile")}>Личный кабинет</button>
+          <button onClick={() => navigate("/cart")}>Корзина</button>
         </div>
       </header>
 
