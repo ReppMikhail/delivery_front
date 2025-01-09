@@ -9,7 +9,10 @@ function CourierPage() {
   const [pendingOrders, setPendingOrders] = useState([]);
   const [inProgressOrders, setInProgressOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isOnDelivery, setIsOnDelivery] = useState(false);
+  const [courierStatus, setCourierStatus] = useState({
+    onShift: false,
+    onDelivery: false,
+  });
 
   useEffect(() => {
     const fetchOrdersAndDeliveryStatus = async () => {
@@ -20,43 +23,37 @@ function CourierPage() {
         const courierId = authData?.id;
         if (!courierId) throw new Error("Courier ID not found in localStorage");
 
-        // Получение заказов
-        const fetchedOrders = await getOrdersByCustomerId(4); // Замените на нужный customerId, если нужно
+        // Получение статуса курьера
+        const courierStatusResponse = await axios.get(
+          `http://localhost:8080/api/v1/couriers/${courierId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData.accessToken}`,
+            },
+          }
+        );
+        setCourierStatus(courierStatusResponse.data);
+
+        // Получение всех заказов
+      const ordersResponse = await axios.get(
+        `http://localhost:8080/api/v1/orders`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData.accessToken}`,
+          },
+        }
+      );
+
+      const fetchedOrders = ordersResponse.data;
         const filteredPendingOrders = fetchedOrders.filter(
-          (order) => order.status === "назначен курьер"  && courierId == order.courierId
+          (order) => order.status === "назначен курьер"  && courierId === order.courierId
         );
         const filteredInProgressOrders = fetchedOrders.filter(
-          (order) => order.status === "в пути"  && courierId == order.courierId
+          (order) => order.status === "в пути"  && courierId === order.courierId
         );
 
         setPendingOrders(filteredPendingOrders);
         setInProgressOrders(filteredInProgressOrders);
-
-        // Проверка статуса доставки
-        const token = authData?.accessToken;
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-
-        const [couriersOnShiftResponse, couriersNotOnDeliveryResponse] =
-          await Promise.all([
-            axios.get("http://localhost:8080/api/v1/couriers/all-on-shift", {
-              headers,
-            }),
-            axios.get(
-              "http://localhost:8080/api/v1/couriers/all-on-shift-and-not-on-delivery",
-              { headers }
-            ),
-          ]);
-
-        const couriersOnShift = couriersOnShiftResponse.data || [];
-        const couriersNotOnDelivery = couriersNotOnDeliveryResponse.data || [];
-
-        const isCurrentlyOnDelivery =
-          couriersOnShift.some((courier) => courier.id === courierId) &&
-          !couriersNotOnDelivery.some((courier) => courier.id === courierId);
-
-        setIsOnDelivery(isCurrentlyOnDelivery);
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       } finally {
@@ -66,6 +63,67 @@ function CourierPage() {
 
     fetchOrdersAndDeliveryStatus();
   }, []);
+
+  const handleStartShift = async () => {
+    try {
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const courierId = authData?.id;
+      const token = authData?.accessToken;
+      if (!courierId || !token)
+        throw new Error("Токен авторизации отсутствует");
+
+      await axios.put(
+        `http://localhost:8080/api/v1/couriers/${courierId}/start-shift`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Курьер начал смену.");
+      setCourierStatus((prev) => ({ ...prev, onShift: true }));
+    } catch (error) {
+      console.error("Ошибка начала смены:", error.message);
+    }
+  };
+
+  const handleEndShift = async () => {
+    try {
+      if (courierStatus.onDelivery) {
+        alert("Нельзя закончить смену, пока вы находитесь в доставке.");
+        return;
+      }
+  
+      if (pendingOrders.length > 0 || inProgressOrders.length > 0) {
+        alert("Нельзя закончить смену, пока есть незавершённые заказы.");
+        return;
+      }
+  
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const courierId = authData?.id;
+      const token = authData?.accessToken;
+      if (!courierId || !token)
+        throw new Error("Токен авторизации отсутствует");
+  
+      await axios.put(
+        `http://localhost:8080/api/v1/couriers/${courierId}/end-shift`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      console.log("Курьер завершил смену.");
+      setCourierStatus((prev) => ({ ...prev, onShift: false }));
+    } catch (error) {
+      console.error("Ошибка завершения смены:", error.message);
+    }
+  };
+  
 
   const handleEndDelivery = async () => {
     try {
@@ -86,7 +144,7 @@ function CourierPage() {
       );
 
       console.log("Курьер завершил доставку.");
-      setIsOnDelivery(false); // Обновляем статус
+      setCourierStatus((prev) => ({ ...prev, onDelivery: false }));
     } catch (error) {
       console.error("Ошибка завершения доставки:", error.message);
     }
@@ -184,6 +242,11 @@ function CourierPage() {
         </div>
         <div className="navbar-right">
           <button onClick={() => navigate("/courier")}>Заказы</button>
+          {courierStatus.onShift && (
+            <button className="end-shift-button" onClick={handleEndShift}>
+              Закончить смену
+            </button>
+          )}
         </div>
       </header>
 
@@ -293,13 +356,20 @@ function CourierPage() {
               ))}
             </div>
           </div>
-        ) : isOnDelivery ? (
+        ) : courierStatus.onShift && courierStatus.onDelivery ? (
           <div>
             <p>Нет доступных заказов.</p>
             <button className="end-delivery-button" onClick={handleEndDelivery}>
               Завершить доставку
             </button>
           </div>
+          ) : !courierStatus.onShift ? (
+            <div>
+              <p>Вы не на смене.</p>
+              <button className="start-shift-button" onClick={handleStartShift}>
+                Начать смену
+              </button>
+            </div>
         ) : (
           <p>Нет доступных заказов.</p>
         )}
