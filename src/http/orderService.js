@@ -112,6 +112,16 @@ export const getCouriersOnShiftAndNotOnDelivery = async () => {
   }
 };
 
+// Получение курьеров на смене и не занятых доставкой
+export const getCourierOrders = async (courierId) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/${courierId}/all-actual-orders`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
 // Назначение курьера на заказ
 export const assignCourierToOrder = async (orderId, courierId) => {
   try {
