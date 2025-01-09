@@ -210,7 +210,7 @@ function CourierPage() {
       if (!token) throw new Error("Токен авторизации отсутствует");
 
       await axios.put(
-        `http://localhost:8080/api/v1/orders/${orderId}/prepare`,
+        `http://localhost:8080/api/v1/orders/${orderId}/cancel`,
         {},
         {
           headers: {
@@ -277,7 +277,7 @@ function CourierPage() {
                     <hr className="divider-line" />
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
-                      <p>{formatOrderTime(order.orderTime)}</p>
+                      <p>{formatOrderTime(order.createdAt)}</p>
                       <p>
                         {order.orderItems.reduce(
                           (acc, item) =>
