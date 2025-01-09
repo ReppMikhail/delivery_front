@@ -4,7 +4,7 @@ import "./MainPage.css";
 import { fetchDishes } from "../http/authService";
 import { useCart } from "../context/CartContext";
 import DishCard from "./DishCard";
-import ImageComponent from './ImageComponent';
+import ImageComponent from "./ImageComponent";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -303,10 +303,9 @@ const MainPage = () => {
             const quantity = getCartItemQuantity(dish.id);
             return (
               <div className="dish-card" key={dish.id}>
-                <ImageComponent />
-                <img
-                  src={dish.imageUrl || "https://via.placeholder.com/150"}
-                  alt={dish.name}
+                <ImageComponent
+                  id={dish.id}
+                  dish={dish}
                   className="dish-image"
                   onClick={() => handleDishClick(dish)}
                 />

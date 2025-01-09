@@ -1,5 +1,6 @@
 import React from "react";
 import "./DishCard.css";
+import ImageComponent from "./ImageComponent";
 
 const DishCard = ({ dish, onClose }) => {
   if (!dish) return null;
@@ -13,11 +14,12 @@ const DishCard = ({ dish, onClose }) => {
       </div>
       <div className="dish-content">
         <div className="dish-image-description">
-          <img
-            src={dish.imageUrl || "https://via.placeholder.com/150"}
-            alt={dish.name}
-            className="dish-image"
-          />
+          <ImageComponent
+                            id={dish.id}
+                            dish={dish}
+                            className="dish-image"
+                            
+                          />
           <div className="dish-description">
             <h3>Описание</h3>
             <p>{dish.description}</p>

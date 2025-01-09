@@ -9,8 +9,9 @@
     z-index: 1000;
     border-radius: 10px;
     width: 95%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
+    min-height: 70vh;
     overflow-y: auto;
     font-family: Arial, sans-serif;
     color: #333;
@@ -50,8 +51,8 @@
   }
   
   .dish-image {
-    width: 150px; /* Уменьшаем ширину изображения */
-    height: 150px;
+    width: 300px; /* Уменьшаем ширину изображения */
+    height: 200px;
     border-radius: 8px;
     object-fit: cover;
   }

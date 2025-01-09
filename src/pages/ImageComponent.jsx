@@ -1,60 +1,65 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
-const ImageComponent = () => {
+const ImageComponent = ({ id, dish, className, onClick }) => {
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Загружаем картинку с сервера
     const loadImage = async () => {
-        try {
-          console.log('Начинаем загрузку изображения...');
-          const response = await fetch('http://localhost:8080/api/v1/menuitems/1/image', {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          });
-      
-          console.log('Ответ от сервера:', response);
-      
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-      
-          // Логгируем все заголовки
-          response.headers.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
-          });
-      
-          // Получаем Content-Type
-          const contentType = response.headers.get('Content-Type');
-          console.log('Заголовок Content-Type:', contentType);
-      
-          if (!contentType || !contentType.startsWith('image/')) {
-            throw new Error('Ответ не является изображением');
-          }
-      
-          const blob = await response.blob();
-          console.log('Blob загружен:', blob);
-          const imageUrl = URL.createObjectURL(blob);
-          console.log('Сгенерированный URL:', imageUrl);
-          setImageSrc(imageUrl);
-        } catch (error) {
-          console.error('Ошибка при запросе изображения:', error);
-        } finally {
-          setLoading(false);
+      if (!id) {
+        setImageSrc(dish?.imageUrl || "https://via.placeholder.com/150");
+        setLoading(false);
+        return;
+      }
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const token = authData?.accessToken;
+      try {
+        const response = await fetch(`http://localhost:8080/api/v1/menuitems/${id}/image`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Ошибка загрузки изображения");
+          setImageSrc("https://via.placeholder.com/150");
+          return;
         }
-      };
-      
+
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setImageSrc(imageUrl);
+      } catch (error) {
+        console.error("Ошибка при запросе изображения:", error);
+        setImageSrc("https://via.placeholder.com/150");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     loadImage();
-  }, []);
+  }, [id, dish]);
 
   if (loading) {
     return <p>Загрузка...</p>;
   }
 
-  return imageSrc ? <img src={imageSrc} alt="Dish" /> : <p>Не удалось загрузить изображение</p>;
+  return (
+    <img
+      src={imageSrc}
+      alt={dish?.name || "Dish"}
+      className={className}
+      onClick={onClick} // Передача обработчика клика
+    />
+  );
+};
+
+ImageComponent.propTypes = {
+  id: PropTypes.number.isRequired,
+  dish: PropTypes.object,
+  className: PropTypes.string,
+  onClick: PropTypes.func, // Проп для клика
 };
 
 export default ImageComponent;
