@@ -23,10 +23,10 @@ function CourierPage() {
         // Получение заказов
         const fetchedOrders = await getOrdersByCustomerId(4); // Замените на нужный customerId, если нужно
         const filteredPendingOrders = fetchedOrders.filter(
-          (order) => order.status === "назначен курьер" // && courierId == order.courierId
+          (order) => order.status === "назначен курьер"  && courierId == order.courierId
         );
         const filteredInProgressOrders = fetchedOrders.filter(
-          (order) => order.status === "в пути" // && courierId == order.courierId
+          (order) => order.status === "в пути"  && courierId == order.courierId
         );
 
         setPendingOrders(filteredPendingOrders);
