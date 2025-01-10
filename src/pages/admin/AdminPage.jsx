@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getAllMenuItems,
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
   getAllIngredients,
-} from "../http/adminService";
-import "./AdminPage.css"; // Для кастомных стилей
+} from "../../http/adminService";
+import "./Admin.css";
 
 const AdminPage = () => {
+  const navigate = useNavigate();
   const [menuItems, setMenuItems] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [activeTab, setActiveTab] = useState("Блюда");
@@ -25,6 +27,7 @@ const AdminPage = () => {
   });
   const [editMode, setEditMode] = useState(false);
   const [editItemId, setEditItemId] = useState(null);
+  const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false); // Состояние для выпадающего списка "О нас"
 
   // Загрузка данных
   useEffect(() => {
@@ -131,20 +134,33 @@ const AdminPage = () => {
 
   return (
     <div className="admin-page">
-      <nav className="admin-nav">
-        {["Блюда", "Клиенты", "Менеджеры", "Курьеры"].map((tab) => (
+      <header className="navbar">
+          <button onClick={() => navigate("/admin")}>Блюда</button>
+          <button onClick={() => navigate("/clients")}>Клиенты</button>
+          <button onClick={() => navigate("/managers")}>Менеджеры</button>
+          <button onClick={() => navigate("/couriers")}>Курьеры</button>
+          <button onClick={() => navigate("/orders")}>Заказы</button>
+          {/* Выпадающее меню "О нас" */}
           <button
-            key={tab}
-            className={activeTab === tab ? "active" : ""}
-            onClick={() => handleTabChange(tab)}
+            onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
           >
-            {tab}
+            О нас
           </button>
-        ))}
-      </nav>
-
+          {aboutDropdownVisible && (
+            <div className="dropdown-popup">
+              <button onClick={() => navigate("/about/system")}>
+                О системе
+              </button>
+              <button onClick={() => navigate("/about/developers")}>
+                О разработчиках
+              </button>
+            </div>
+          )}
+          <span>+7 937 123 98 56</span>
+      </header>
+      
       <div className="admin-content">
-        {activeTab === "Блюда" && (
+        
           <div>
             <h2>Список блюд</h2>
             <button onClick={handleAddClick}>Добавить блюдо</button>
@@ -152,8 +168,15 @@ const AdminPage = () => {
               {menuItems.map((item) => (
                 <li key={item.id} className="menu-item">
                   <div>
+                    <p>ID: {item.id}</p> {/* Добавлено отображение ID */}
                     <strong>{item.name}</strong>
                     <p>{item.description}</p>
+                    <p>Цена: {item.price} руб.</p>
+                    <p>Категория: {item.category}</p>
+                    <p>Доступность: {item.availabilityStatus ? "Доступно" : "Не доступно"}</p>
+                    <p>Вес: {item.weight} г</p>
+                    <p>Калории: {item.calories} ккал</p>
+                    <p>Ингредиенты: {item.ingredients.map((ing) => ing.name).join(", ")}</p>
                   </div>
                   <div>
                     <button onClick={() => handleEditClick(item)}>✏️</button>
@@ -249,8 +272,7 @@ const AdminPage = () => {
               </div>
             )}
           </div>
-        )}
-        {/* Здесь можно добавить содержимое для других вкладок */}
+        
       </div>
     </div>
   );
