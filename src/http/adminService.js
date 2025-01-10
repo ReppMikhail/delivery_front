@@ -71,6 +71,67 @@ export const getAllMenuItems = async () => {
     }
   };
 
+  export const getAllManagers = async () => {
+    try {
+      const response = await axiosInstance.get(`${API_BASE_URL}/users/managers`);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const getAllCouriers = async () => {
+    try {
+      const response = await axiosInstance.get(`${API_BASE_URL}/users/couriers`);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const getAllCustomers = async () => {
+    try {
+      const response = await axiosInstance.get(`${API_BASE_URL}/users/customers`);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const createEmployee = async (employeeData) => {
+    try {
+      const response = await axiosInstance.post(`${API_BASE_URL}/auth/register-for-admin`, employeeData);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const createCustomer = async (customerData) => {
+    try {
+      const response = await axiosInstance.post(`${API_BASE_URL}/auth/register`, customerData);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const updateUser = async (id, userData) => {
+    try {
+      await axiosInstance.put(`${API_BASE_URL}/users/${id}`, userData);
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const deleteUser = async (id) => {
+    try {
+      await axiosInstance.delete(`${API_BASE_URL}/users/${id}`);
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
 // Функция для получения всех заказов
 export const getAllOrders = async () => {
     try {
