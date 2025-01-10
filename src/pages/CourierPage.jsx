@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getOrdersByCustomerId } from "../http/orderService";
 import axios from "axios";
-import "./Courier.css";
+import "./CourierPage.css";
 
 function CourierPage() {
   const navigate = useNavigate();

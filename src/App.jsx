@@ -9,7 +9,11 @@ import Profile from "./pages/Profile";
 import CartPage from "./pages/CartPage";
 import ManagerPage from "./pages/ManagerPage";
 import CourierPage from "./pages/CourierPage";
-import AdminPage from "./pages/AdminPage";
+import AdminPage from "./pages/admin/AdminPage";
+import Clients from "./pages/admin/Clients";
+import Couriers from "./pages/admin/Couriers";
+import Managers from "./pages/admin/Managers";
+//import Orders from "./pages/admin/Orders";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -33,6 +37,10 @@ function App() {
             navigate("/manager");
           } else if (decodedToken.role === "courier") {
             navigate("/courier");
+          } else if (decodedToken.role === "admin") {
+            navigate("/admin");
+          } else if (decodedToken.role === "customer") {
+            navigate("/main");
           }
         }
       } catch (error) {
@@ -47,9 +55,16 @@ function App() {
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
       <Route path="/admin" element={<ProtectedRoute role="ROLE_ADMIN"><AdminPage /></ProtectedRoute>} />
+      <Route path="/clients" element={<ProtectedRoute role="ROLE_ADMIN"><Clients /></ProtectedRoute>} />
+      <Route path="/couriers" element={<ProtectedRoute role="ROLE_ADMIN"><Couriers /></ProtectedRoute>} />
+      <Route path="/managers" element={<ProtectedRoute role="ROLE_ADMIN"><Managers /></ProtectedRoute>} />
+      {/* <Route path="/orders" element={<ProtectedRoute role="ROLE_ADMIN"><Orders /></ProtectedRoute>} /> */}
+
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
       <Route path="/courier" element={<ProtectedRoute role="ROLE_COURIER"><CourierPage /></ProtectedRoute>} />
+
       <Route path="/main" element={<ProtectedRoute role="ROLE_CUSTOMER"><MainPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute role="ROLE_CUSTOMER"><Profile /></ProtectedRoute>} />
       <Route path="/cart" element={<ProtectedRoute role="ROLE_CUSTOMER"><CartPage /></ProtectedRoute>} />
