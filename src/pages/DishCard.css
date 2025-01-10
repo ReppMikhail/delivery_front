@@ -1,5 +1,8 @@
 .dish-card-popup {
     position: fixed;
+    display: flex;
+    flex-direction: column; /* Вертикальное расположение содержимого */
+    justify-content: space-between; /* Распределение пространства между элементами */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -16,6 +19,18 @@
     font-family: Arial, sans-serif;
     color: #333;
   }  
+
+  .close-button {
+    background-color: rgba(255, 0, 0, 0.249);
+    border: 1px solid #ccc; /* Граница */
+  border-radius: 5px; /* Слегка закругленные края */
+  font-size: 16px; /* Размер текста */
+  cursor: pointer; /* Курсор указателя */
+  }
+
+  .close-button:hover {
+    background-color: rgba(165, 0, 0, 0.444);
+  }
   
   .dish-card-header {
     display: flex;
@@ -35,17 +50,17 @@
     color: #fff;
     padding: 5px 10px;
     border-radius: 15px;
-    font-size: 12px;
+    font-size: 14px; /* Размер текста */
   }
   
   .dish-content {
     margin-top: 10px;
+    flex-grow: 1; /* Заставляет контент занимать всё оставшееся пространство */
   }
   
   .dish-image-description {
     display: flex;
     gap: 15px;
-    align-items: center;
     margin-bottom: 20px;
     background-color: #b0e1d163;
   }
@@ -62,43 +77,50 @@
   }
   
   .dish-description h3 {
-    font-size: 16px;
-    margin-bottom: 10px;
+    font-size: 20px;
+    
   }
   
   .dish-description p {
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 16px;
   }
   
   .dish-details p {
     margin: 5px 0;
-    font-size: 14px;
+    font-size: 18px;
+    margin-bottom: 15px;
   }
   
-  .dish-footer {
+  .dish-card-popup .dish-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    margin-top: auto; /* Сдвигает футер вниз */
   }
   
   .dish-quantity-control {
     display: flex;
     align-items: center;
   }
-  
-  .quantity-button {
-    background: #ddd;
-    border: none;
-    padding: 5px;
-    border-radius: 5px;
-    cursor: pointer;
+
+  .dish-quantity-control button {
+    width: 40px; /* Ширина кнопки */
+  height: 40px; /* Высота кнопки */
+  border: 1px solid #ccc; /* Граница */
+  border-radius: 5px; /* Слегка закругленные края */
+  font-size: 16px; /* Размер текста */
+  display: flex;
+  justify-content: center; /* Выравнивание текста по центру */
+  align-items: center; /* Вертикальное выравнивание текста */
+  cursor: pointer; /* Курсор указателя */
+  padding: 0; /* Убираем внутренние отступы */
   }
+  
+
   
   .quantity {
     margin: 0 10px;
-    font-size: 14px;
+    font-size: 16px;
   }
   
   .dish-price {

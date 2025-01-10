@@ -2,7 +2,7 @@ import React from "react";
 import "./DishCard.css";
 import ImageComponent from "./ImageComponent";
 
-const DishCard = ({ dish, onClose }) => {
+const DishCard = ({ dish, onClose, addToCart, removeFromCart, quantity, navigate }) => {
   if (!dish) return null;
 
   return (
@@ -15,11 +15,10 @@ const DishCard = ({ dish, onClose }) => {
       <div className="dish-content">
         <div className="dish-image-description">
           <ImageComponent
-                            id={dish.id}
-                            dish={dish}
-                            className="dish-image"
-                            
-                          />
+            id={dish.id}
+            dish={dish}
+            className="dish-image"
+          />
           <div className="dish-description">
             <h3>Описание</h3>
             <p>{dish.description}</p>
@@ -33,13 +32,39 @@ const DishCard = ({ dish, onClose }) => {
       </div>
       <div className="dish-footer">
         <div className="dish-quantity-control">
-          <button className="quantity-button">-</button>
-          <span className="quantity">1 шт</span>
-          <button className="quantity-button">+</button>
+          <button
+            className="minus-button"
+            onClick={() => removeFromCart(dish.id)}
+            disabled={quantity === 0} // Блокируем "-" при количестве 0
+          >
+            -
+          </button>
+          <span className="quantity">{quantity} шт</span>
+          <button
+            className="plus-button"
+            onClick={() => addToCart(dish)}
+          >
+            +
+          </button>
         </div>
         <div className="dish-price">
-          <span>{dish.price} ₽</span>
-          <button className="add-to-cart">Добавить в корзину</button>
+          <span>{dish.price * quantity} ₽</span>
+          {/* Изменение текста кнопки в зависимости от наличия блюда в корзине */}
+          {quantity > 0 ? (
+            <button
+              className="go-to-cart-button"
+              onClick={() => navigate("/cart")} // Переход в корзину
+            >
+              Перейти в корзину
+            </button>
+          ) : (
+            <button
+              className="add-to-cart"
+              onClick={() => addToCart(dish)}
+            >
+              Добавить в корзину
+            </button>
+          )}
         </div>
       </div>
     </div>
