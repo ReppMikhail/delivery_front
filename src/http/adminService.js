@@ -22,6 +22,16 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+// Получить список всех ингредиентов
+export const getAllIngredients = async () => {
+    try {
+      const response = await axiosInstance.get(`${API_BASE_URL}/ingredients`);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
 // Получить список всех блюд
 export const getAllMenuItems = async () => {
     try {
@@ -43,9 +53,9 @@ export const getAllMenuItems = async () => {
   };
   
   // Обновить существующее блюдо
-  export const updateMenuItem = async (id, menuItem) => {
+  export const updateMenuItem = async (menuItem) => {
     try {
-      const response = await axiosInstance.put(`${API_BASE_URL}/menuitems/${id}`, menuItem);
+      const response = await axiosInstance.put(`${API_BASE_URL}/menuitems`, menuItem);
       return response.data;
     } catch (error) {
       throw error.response ? error.response.data : new Error("Network Error");
