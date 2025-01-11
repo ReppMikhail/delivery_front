@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  getCouriersOnShift,
   getAllCouriers,
   createEmployee,
   updateUser,
@@ -70,12 +71,25 @@ const CouriersPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
+      // Получаем список курьеров на смене
+      const couriersOnShift = await getCouriersOnShift();
+  
+      // Проверяем, находится ли курьер на смене
+      const isOnShift = couriersOnShift.some(courier => courier.userId === id && courier.onShift);
+  
+      if (isOnShift) {
+        alert("Нельзя удалить курьера, который находится на смене.");
+        return;
+      }
+  
+      // Если курьер не на смене, выполняем удаление
       await deleteUser(id);
       loadCouriers();
     } catch (error) {
       console.error("Ошибка удаления курьера:", error);
     }
   };
+  
 
   const handleFormSubmit = async () => {
     try {
@@ -106,6 +120,7 @@ const CouriersPage = () => {
         <button onClick={() => navigate("/managers")}>Менеджеры</button>
         <button onClick={() => navigate("/couriers")}>Курьеры</button>
         <button onClick={() => navigate("/orders")}>Заказы</button>
+        <button onClick={() => navigate("/directory")}>Справочник</button>
         <button
           onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
         >
