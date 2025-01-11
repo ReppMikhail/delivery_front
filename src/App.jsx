@@ -13,7 +13,8 @@ import AdminPage from "./pages/admin/AdminPage";
 import Clients from "./pages/admin/Clients";
 import Couriers from "./pages/admin/Couriers";
 import Managers from "./pages/admin/Managers";
-//import Orders from "./pages/admin/Orders";
+import Orders from "./pages/admin/Orders";
+import Directory from "./pages/admin/Directory";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -60,7 +61,8 @@ function App() {
       <Route path="/clients" element={<ProtectedRoute role="ROLE_ADMIN"><Clients /></ProtectedRoute>} />
       <Route path="/couriers" element={<ProtectedRoute role="ROLE_ADMIN"><Couriers /></ProtectedRoute>} />
       <Route path="/managers" element={<ProtectedRoute role="ROLE_ADMIN"><Managers /></ProtectedRoute>} />
-      {/* <Route path="/orders" element={<ProtectedRoute role="ROLE_ADMIN"><Orders /></ProtectedRoute>} /> */}
+      <Route path="/orders" element={<ProtectedRoute role="ROLE_ADMIN"><Orders /></ProtectedRoute>} />
+      <Route path="/directory" element={<ProtectedRoute role="ROLE_ADMIN"><Directory /></ProtectedRoute>} />
 
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
       <Route path="/courier" element={<ProtectedRoute role="ROLE_COURIER"><CourierPage /></ProtectedRoute>} />

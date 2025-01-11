@@ -32,6 +32,16 @@ export const getAllIngredients = async () => {
     }
   };
 
+// Получить список всех видов кухни
+export const getAllKitchens = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/kitchens`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
 // Получить список всех блюд
 export const getAllMenuItems = async () => {
     try {
@@ -46,6 +56,16 @@ export const getAllMenuItems = async () => {
   export const createMenuItem = async (menuItem) => {
     try {
       const response = await axiosInstance.post(`${API_BASE_URL}/menuitems`, menuItem);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  // Добавить картинку
+  export const addImage = async (id, image) => {
+    try {
+      const response = await axiosInstance.post(`${API_BASE_URL}/menuitems/${id}/image`, image);
       return response.data;
     } catch (error) {
       throw error.response ? error.response.data : new Error("Network Error");
@@ -141,3 +161,32 @@ export const getAllOrders = async () => {
       throw error.response ? error.response.data : new Error("Network Error");
     }
   };
+
+// Функция для получения пользователя по его id
+export const getUserById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/users/${id}/no-orders`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+// Функция для получения курьера по его id
+export const getCourierById = async (courierId) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/${courierId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+export const getCouriersOnShift = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/all-on-shift`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
