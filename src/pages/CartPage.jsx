@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./CartPage.css";
 import { useCart } from "../context/CartContext";
 import { createOrder, getUserByIdNoOrders } from "../http/orderService"; // Импорт необходимых функций
+import ImageComponent from "./ImageComponent";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -108,7 +109,11 @@ const CartPage = () => {
       <div className="cart-items">
         {cartItems.map((item) => (
           <div className="cart-item" key={item.id}>
-            <img src={item.imageUrl} alt={item.name} className="cart-item-image" />
+            <ImageComponent
+                                      id={item.id}
+                                      dish={item}
+                                      className="cart-item-image"
+                                    />
             <div className="cart-item-info">
               <h3>{item.name}</h3>
               <p>{item.weight} г</p>

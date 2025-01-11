@@ -66,9 +66,9 @@
     border-bottom: none;
   }
   
-  .cart-item-image {
-    width: 100px;
-    height: 100px;
+  .cart-item .cart-item-image {
+    width: 180px;
+    height: 120px;
     object-fit: cover;
     border-radius: 8px;
     margin-right: 20px;

@@ -80,7 +80,7 @@ h2 {
 
 .dish-card .dish-image {
   width: 100%;
-  height: 180px; /* Увеличен размер изображения */
+  height: 250px; /* Увеличен размер изображения */
   object-fit: cover;
 }
 
@@ -178,3 +178,158 @@ h2 {
     background: rgba(0, 0, 0, 0.5);
     z-index: 999;
   }
+/* Обычная кнопка сортировки */
+.sort-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+/* Активная кнопка сортировки */
+.sort-button.active-sort {
+  background-color: rgba(53, 255, 8, 0.229);
+}
+
+/* Активная кнопка сортировки */
+.sort-button.active-sort:hover {
+  background-color: rgba(32, 169, 2, 0.4);
+}
+
+/* Выпадающий список сортировки */
+.sort-options {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 5px;
+  z-index: 10;
+  padding: 5px 0;
+}
+
+.sort-options button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.sort-options button:hover {
+  background-color: #f0f0f0;
+}
+
+.filter-modal {
+  position: fixed; /* Фиксированное положение */
+  top: 50%; /* Центрируем по вертикали */
+  left: 50%; /* Центрируем по горизонтали */
+  transform: translate(-50%, -50%); /* Сдвиг для точного центрирования */
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%; /* Адаптивность для маленьких экранов */
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-modal h3 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.filter-modal label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Выравнивание по центру */
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.filter-modal label span {
+  flex: 1; /* Автоматически растягивает текстовое описание */
+}
+
+.filter-modal label input {
+  width: 150px; /* Одинаковая ширина для всех полей */
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: right; /* Выравнивание текста в поле */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-actions button:hover {
+  background-color: #f0f0f0;
+}
+
+
+.modal-actions button:hover {
+  background-color: #f0f0f0;
+}
+
+.filter-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background-color: #f0f0f0;
+}
+
+.ingredient-filters {
+  margin-top: 20px;
+}
+
+/* Добавляем отступ между заголовком и списком ингредиентов */
+.ingredient-filters h4 {
+  margin-bottom: 10px; /* Отступ снизу */
+}
+
+/* Сетка для ингредиентов */
+.ingredient-filters .ingredient-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Устанавливаем минимальную ширину ячейки */
+  gap: 10px; /* Расстояние между ячейками */
+}
+
+.ingredient-filters label {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  background-color: #f9f9f9; /* Нежный фон для ячеек */
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ingredient-filters input {
+  margin-right: 10px;
+}
+
