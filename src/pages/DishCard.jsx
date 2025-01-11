@@ -10,7 +10,7 @@ const DishCard = ({ dish, onClose, addToCart, removeFromCart, quantity, navigate
       <div className="dish-card-header">
         <button className="close-button" onClick={onClose}>Назад</button>
         <h2 className="dish-title">{dish.name}</h2>
-        <span className="dish-category">Японская</span>
+        <span className="dish-category">{dish.kitchen?.name || "Неизвестная кухня"}</span>
       </div>
       <div className="dish-content">
         <div className="dish-image-description">

@@ -39,6 +39,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: 20px;
   }
   
   h1 span {
@@ -53,6 +54,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
+    margin-inline: 20px;
   }
   
   .cart-item {
@@ -61,6 +63,45 @@
     border-bottom: 1px solid #e0e0e0;
     padding: 10px 0;
   }
+
+/* Заголовок блока корзины */
+.cart-items-header {
+  display: flex;
+  align-items: center;
+
+  font-weight: bold;
+}
+
+.cart-item-header-image,
+.cart-item-header-info,
+.cart-item-header-price,
+.cart-item-header-quantity,
+.cart-item-header-total,
+.cart-item-header-remove {
+  text-align: center;
+  color: #484848;
+  font-weight: 100;
+}
+
+.cart-item-header-image {
+  width: 200px;
+}
+
+.cart-item-header-info {
+  flex: 2;
+  text-align: left;
+}
+
+.cart-item-header-price,
+.cart-item-header-quantity,
+.cart-item-header-total {
+  flex: 1;
+}
+
+.cart-item-header-remove {
+  width: 40px;
+}
+
   
   .cart-item:last-child {
     border-bottom: none;
@@ -131,6 +172,7 @@
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     font-size: 18px;
+    margin-inline: 20px;
   }
   
   .place-order-button {
@@ -146,5 +188,15 @@
   
   .place-order-button:hover {
     background-color: #e68a00;
+  }
+  
+  .order-comment {
+    width: 500px; /* Заполнить доступное пространство */
+    font-size: 16px; /* Более крупный текст */
+    border: 1px solid #ccc; /* Граница вокруг поля */
+    border-radius: 8px; /* Скругленные углы */
+    padding: 10px; /* Внутренние отступы */
+    resize: none; /* Запрет на изменение размера */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень для красоты */
   }
   

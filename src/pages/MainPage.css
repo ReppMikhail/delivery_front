@@ -35,6 +35,7 @@ header.navbar {
   justify-content: space-around;
   padding: 10px 20px;
   background-color: #fff;
+  border-radius: 50px;
 }
 
 .categories-container {

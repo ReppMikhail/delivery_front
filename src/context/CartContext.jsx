@@ -30,6 +30,11 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  const setCartItemsDirectly = (items) => {
+    setCartItems(items);
+  };
+  
+
   const removeFromCart = (id) => {
     setCartItems((prevItems) =>
       prevItems
@@ -70,7 +75,8 @@ export const CartProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         deleteFromCart,
-        formatDate
+        formatDate,
+        setCartItemsDirectly, // Добавляем эту функцию
       }}
     >
       {children}

@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CartPage.css";
 import { useCart } from "../context/CartContext";
 import { createOrder, getUserByIdNoOrders } from "../http/orderService"; // Импорт необходимых функций
 import ImageComponent from "./ImageComponent";
 
+
 const CartPage = () => {
   const navigate = useNavigate();
   const { cartItems, addToCart, removeFromCart, deleteFromCart, clearCart, formatDate } = useCart();
+  const [comment, setComment] = useState(""); // Состояние для комментария
 
   const handleIncreaseQuantity = (item) => {
     addToCart(item);
@@ -68,6 +70,7 @@ const CartPage = () => {
         })),
         deliveryAddress: userData.address, // Адрес доставки клиента из базы данных
         orderTime: orderTime,
+        comment, // Передаем комментарий
       };
 
       // Отправка заказа через orderService
@@ -107,6 +110,14 @@ const CartPage = () => {
       </h1>
 
       <div className="cart-items">
+      <div className="cart-items-header">
+    <div className="cart-item-header-image"></div>
+    <div className="cart-item-header-info">Блюдо</div>
+    <div className="cart-item-header-price">Цена</div>
+    <div className="cart-item-header-quantity">Кол-во</div>
+    <div className="cart-item-header-total">Сумма</div>
+    <div className="cart-item-header-remove"></div>
+  </div>
         {cartItems.map((item) => (
           <div className="cart-item" key={item.id}>
             <ImageComponent
@@ -139,6 +150,12 @@ const CartPage = () => {
 
       <div className="cart-summary">
         <div>Итого к оплате: {totalPrice} ₽</div>
+        <textarea
+          placeholder="Добавить комментарий к заказу..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          className="order-comment"
+        ></textarea>
         <button onClick={handlePlaceOrder} className="place-order-button">
           Оформить заказ
         </button>

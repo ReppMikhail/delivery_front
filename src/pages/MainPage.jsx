@@ -21,9 +21,46 @@ const MainPage = () => {
   const [maxPrice, setMaxPrice] = useState("");
   const [ingredients, setIngredients] = useState([]); // Список ингредиентов
 const [excludedIngredients, setExcludedIngredients] = useState([]); // Выбранные ингредиенты
+const [kitchens, setKitchens] = useState([]); // Список кухонь
+const [selectedKitchens, setSelectedKitchens] = useState([]); // Выбранные кухни
+const [tempMinPrice, setTempMinPrice] = useState("");
+const [tempMaxPrice, setTempMaxPrice] = useState("");
+const [tempExcludedIngredients, setTempExcludedIngredients] = useState([]);
+const [tempSelectedKitchens, setTempSelectedKitchens] = useState([]);
+
+
 
   // Загрузка блюд
   useEffect(() => {
+
+    const loadKitchens = async () => {
+      try {
+        const authData = JSON.parse(localStorage.getItem("authData"));
+        const token = authData?.accessToken;
+        if (!token) {
+          throw new Error("Токен авторизации отсутствует");
+        }
+  
+        const response = await fetch("http://localhost:8080/api/v1/kitchens", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setKitchens(data);
+      } catch (error) {
+        console.error("Ошибка загрузки кухонь:", error);
+      }
+    };
+  
+    loadKitchens();
+
     const loadDishes = async () => {
       setLoading(true);
       try {
@@ -109,9 +146,18 @@ const [excludedIngredients, setExcludedIngredients] = useState([]); // Выбр�
       const containsExcludedIngredient = dish.ingredients.some((ingredient) =>
         excludedIngredients.includes(ingredient.name)
       );
+
+      // Проверка на кухни
+    const isKitchenSelected =
+    selectedKitchens.length === 0 || selectedKitchens.includes(dish.kitchen?.name);
   
-      return price >= min && price <= max && !containsExcludedIngredient;
-    });
+    return (
+      price >= min &&
+      price <= max &&
+      !containsExcludedIngredient &&
+      isKitchenSelected
+    );
+  });
   
     const groupedDishes = {};
     filteredDishes.forEach((dish) => {
@@ -157,8 +203,21 @@ const [excludedIngredients, setExcludedIngredients] = useState([]); // Выбр�
   };
 
   const applyFilters = () => {
+    setMinPrice(tempMinPrice);
+    setMaxPrice(tempMaxPrice);
+    setExcludedIngredients(tempExcludedIngredients);
+    setSelectedKitchens(tempSelectedKitchens);
     setFilterModalVisible(false);
-  };
+};
+
+const resetFilters = () => {
+  setTempMinPrice("");
+  setTempMaxPrice("");
+  setTempExcludedIngredients([]);
+  setTempSelectedKitchens([]);
+};
+
+
 
   return (
     <div className="main-page">
@@ -306,23 +365,23 @@ const [excludedIngredients, setExcludedIngredients] = useState([]); // Выбр�
 
       {/* Фильтр по цене */}
       <label>
-        Минимальная цена:
-        <input
-          type="number"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-          placeholder="0"
-        />
-      </label>
-      <label>
-        Максимальная цена:
-        <input
-          type="number"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-          placeholder="1000"
-        />
-      </label>
+    Минимальная цена:
+    <input
+        type="number"
+        value={tempMinPrice}
+        onChange={(e) => setTempMinPrice(e.target.value)}
+        placeholder="0"
+    />
+</label>
+<label>
+    Максимальная цена:
+    <input
+        type="number"
+        value={tempMaxPrice}
+        onChange={(e) => setTempMaxPrice(e.target.value)}
+        placeholder="1000"
+    />
+</label>
 
       {/* Фильтр по ингредиентам */}
       <div className="ingredient-filters">
@@ -331,25 +390,49 @@ const [excludedIngredients, setExcludedIngredients] = useState([]); // Выбр�
     {ingredients.map((ingredient) => (
       <label key={ingredient.id}>
         <input
-          type="checkbox"
-          checked={excludedIngredients.includes(ingredient.name)}
-          onChange={() => {
-            setExcludedIngredients((prev) =>
-              prev.includes(ingredient.name)
-                ? prev.filter((name) => name !== ingredient.name)
-                : [...prev, ingredient.name]
-            );
-          }}
-        />
+                type="checkbox"
+                checked={tempExcludedIngredients.includes(ingredient.name)}
+                onChange={() => {
+                    setTempExcludedIngredients((prev) =>
+                        prev.includes(ingredient.name)
+                            ? prev.filter((name) => name !== ingredient.name)
+                            : [...prev, ingredient.name]
+                    );
+                }}
+            />
         {ingredient.name}
+      </label>
+    ))}
+  </div>
+
+  <div className="kitchen-filters">
+  <h4>Выбрать кухни:</h4>
+  <div className="kitchen-list">
+    {kitchens.map((kitchen) => (
+      <label key={kitchen.id}>
+        <input
+                type="checkbox"
+                checked={tempSelectedKitchens.includes(kitchen.name)}
+                onChange={() => {
+                    setTempSelectedKitchens((prev) =>
+                        prev.includes(kitchen.name)
+                            ? prev.filter((name) => name !== kitchen.name)
+                            : [...prev, kitchen.name]
+                    );
+                }}
+            />
+        {kitchen.name}
       </label>
     ))}
   </div>
 </div>
 
+</div>
+
 
       <div className="modal-actions">
         <button onClick={applyFilters}>Применить</button>
+        <button onClick={resetFilters}>Сбросить</button>
         <button onClick={toggleFilterModal}>Закрыть</button>
       </div>
     </div>
