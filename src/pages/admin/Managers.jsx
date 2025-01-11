@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  getAllOrders,
   getAllManagers,
   createEmployee,
   updateUser,
@@ -70,12 +71,29 @@ const ManagersPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
+      // Получить все заказы
+      const orders = await getAllOrders();
+  
+      // Проверить заказы, относящиеся к менеджеру
+      const hasActiveOrders = orders.some(
+        (order) =>
+          order.status !== "доставлен" &&
+          order.status !== "отменен"
+      );
+  
+      if (hasActiveOrders) {
+        alert("Невозможно удалить менеджера, так как имеются активные заказы.");
+        return;
+      }
+  
+      // Удалить менеджера, если нет активных заказов
       await deleteUser(id);
       loadManagers();
     } catch (error) {
       console.error("Ошибка удаления менеджера:", error);
     }
   };
+  
 
   const handleFormSubmit = async () => {
     try {
@@ -109,6 +127,7 @@ const ManagersPage = () => {
             <button onClick={() => navigate("/managers")}>Менеджеры</button>
             <button onClick={() => navigate("/couriers")}>Курьеры</button>
             <button onClick={() => navigate("/orders")}>Заказы</button>
+            <button onClick={() => navigate("/directory")}>Справочник</button>
           {/* Выпадающее меню "О нас" */}
           <button
             onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}

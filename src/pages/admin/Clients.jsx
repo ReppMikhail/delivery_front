@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  getAllOrders,
   getAllCustomers,
   createCustomer,
   updateUser,
@@ -69,13 +70,30 @@ const ClientsPage = () => {
   };
 
   const handleDeleteClick = async (id) => {
-    try {
-      await deleteUser(id);
-      loadClients();
-    } catch (error) {
-      console.error("Error deleting client:", error);
-    }
-  };
+      try {
+        // Получить все заказы
+        const orders = await getAllOrders();
+    
+        // Проверить заказы, относящиеся к менеджеру
+        const hasActiveOrders = orders.some(
+          (order) =>
+            order.customerId === id &&
+            order.status !== "доставлен" &&
+            order.status !== "отменен"
+        );
+    
+        if (hasActiveOrders) {
+          alert("Невозможно удалить клиента, так как имеются активные заказы.");
+          return;
+        }
+    
+        // Удалить менеджера, если нет активных заказов
+        await deleteUser(id);
+        loadClients();
+      } catch (error) {
+        console.error("Ошибка удаления клиента:", error);
+      }
+    };
 
   const handleFormSubmit = async () => {
     try {
@@ -106,6 +124,7 @@ const ClientsPage = () => {
         <button onClick={() => navigate("/managers")}>Менеджеры</button>
         <button onClick={() => navigate("/couriers")}>Курьеры</button>
         <button onClick={() => navigate("/orders")}>Заказы</button>
+        <button onClick={() => navigate("/directory")}>Справочник</button>
         <button
           onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
         >
