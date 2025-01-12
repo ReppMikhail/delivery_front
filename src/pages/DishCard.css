@@ -20,7 +20,7 @@
     color: #333;
   }  
 
-  .close-button {
+  .dish-card-header .close-button {
     background-color: rgba(255, 0, 0, 0.249);
     border: 1px solid #ccc; /* Граница */
   border-radius: 5px; /* Слегка закругленные края */
@@ -39,7 +39,7 @@
     margin-bottom: 15px;
   }
   
-  .dish-title {
+  .dish-card-header .dish-title {
     font-size: 18px;
     font-weight: bold;
     margin: 0;
