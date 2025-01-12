@@ -9,7 +9,7 @@
   color: #333;
 }
 
-.navbar {
+.admin-page .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,7 +18,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.navbar button {
+.admin-page .navbar button {
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -28,17 +28,17 @@
   color: #333;
 }
 
-.navbar button:hover {
+.admin-page .navbar button:hover {
   background-color: #e6e6e6;
   border-radius: 4px;
 }
 
-.navbar span {
+.admin-page .navbar span {
   font-weight: bold;
   color: #555;
 }
 
-.dropdown-popup {
+.admin-page .dropdown-popup {
   position: absolute;
   background-color: white;
   border: 1px solid #ccc;
@@ -48,18 +48,18 @@
   z-index: 100;
 }
 
-.admin-content {
+.admin-page .admin-content {
   padding: 20px;
 }
 
 /* Список блюд */
-.menu-list {
+.admin-page .menu-list {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
-.menu-item {
+.admin-page .menu-item {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -71,22 +71,22 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.menu-item div {
+.admin-page .menu-item div {
   flex: 1;
 }
 
-.menu-item p {
+.admin-page .menu-item p {
   margin: 5px 0;
   font-size: 14px;
   color: #555;
 }
 
-.menu-item strong {
+.admin-page .menu-item strong {
   font-size: 16px;
   color: #333;
 }
 
-.menu-item button {
+.admin-page .menu-item button {
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -95,12 +95,12 @@
   color: #888;
 }
 
-.menu-item button:hover {
+.admin-page .menu-item button:hover {
   color: #555;
 }
 
 /* Форма добавления/редактирования */
-.menu-form {
+.admin-page .menu-form {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -109,7 +109,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.menu-form h3 {
+.admin-page .menu-form h3 {
   margin-top: 0;
   font-size: 18px;
   color: #333;
@@ -159,12 +159,12 @@
 }
 
 /* Кнопки в заголовке */
-button:hover {
+.admin-page button:hover {
   cursor: pointer;
 }
 
 /* Кнопка добавления блюда */
-button {
+.admin-page button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -173,14 +173,14 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+.admin-page button:hover {
   background-color: #45a049;
 }
 
 
 
 
-.directory-container {
+.admin-page .directory-container {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
@@ -196,12 +196,12 @@ button:hover {
   background-color: #f9f9f9;
 }
 
-h3 {
+.admin-page h3 {
   text-align: center;
   margin-bottom: 15px;
 }
 
-.directory-item {
+.admin-page .directory-item {
   margin-bottom: 15px;
   padding: 10px;
   border: 1px solid #ddd;
@@ -209,7 +209,7 @@ h3 {
   background-color: #fff;
 }
 
-.directory-item p {
+.admin-page .directory-item p {
   margin: 5px 0;
 }
 
