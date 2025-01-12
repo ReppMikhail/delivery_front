@@ -101,27 +101,30 @@ function ManagerPage() {
     }
   };
 
-  // Начало доставки
   const handleStartDelivery = async (courierId) => {
     try {
       await startCourierDelivery(courierId);
+  
       setCouriers((prevCouriers) =>
         prevCouriers.map((courier) =>
           courier.userId === courierId ? { ...courier, onDelivery: true } : courier
         )
       );
-
+  
       setOrders((prevOrders) =>
-        prevOrders.map((order) => {
-          const updatedOrder = updatedOrders.find((o) => o.id === order.id);
-          return updatedOrder ? updatedOrder : order;
-        })
+        prevOrders.map((order) =>
+          order.courierId === courierId && order.status === "назначен курьер"
+            ? { ...order, status: "в пути" }
+            : order
+        )
       );
+  
       alert(`Курьер ${courierId} начал доставку.`);
     } catch (err) {
       alert(err.message || "Ошибка при начале доставки");
     }
   };
+  
 
   return (
     <div className="manager-container">

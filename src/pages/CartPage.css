@@ -6,32 +6,6 @@
     background-color: #f8f8f8;
   }
   
-  /* Навигационная панель */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .navbar-left button,
-  .navbar-right button {
-    background: none;
-    border: none;
-    color: #333;
-    font-size: 16px;
-    cursor: pointer;
-    margin-right: 15px;
-  }
-  
-  .navbar-left span {
-    font-size: 16px;
-    color: #666;
-  }
-  
   /* Заголовок корзины */
   h1 {
     font-size: 28px;

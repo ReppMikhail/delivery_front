@@ -5,31 +5,6 @@
   background-color: #f5f5f5;
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-left button,
-.navbar-right button {
-  background: none;
-  border: none;
-  color: #333;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 0 10px;
-}
-
-.navbar-left span {
-  margin-left: 20px;
-  font-size: 16px;
-  color: #666;
-}
-
 .content {
   display: flex;
   flex-direction: column;
@@ -158,3 +133,23 @@
   font-size: 16px;
 }
 
+.start-shift-button {
+  background-color: #00c853;
+  color: #fff;
+  border: none;
+  padding: 10px 50px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.center-div {
+  text-align: center;
+}
+
+.order-comment {
+  font-style: italic;
+  color: #555;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}

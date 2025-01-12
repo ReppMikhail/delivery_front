@@ -4,6 +4,7 @@ import "./CartPage.css";
 import { useCart } from "../context/CartContext";
 import { createOrder, getUserByIdNoOrders } from "../http/orderService"; // Импорт необходимых функций
 import ImageComponent from "./ImageComponent";
+import NavigationBar from "../components/NavigationBar";
 
 
 const CartPage = () => {
@@ -93,17 +94,7 @@ const CartPage = () => {
 
   return (
     <div className="cart-page">
-      <header className="navbar">
-        <div className="navbar-left">
-          <button onClick={() => navigate("/main")}>Главная</button>
-          <button onClick={() => navigate("/about")}>О нас</button>
-          <span>+7 937 123 98 56</span>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate("/profile")}>Личный кабинет</button>
-          <button onClick={() => navigate("/cart")}>Корзина</button>
-        </div>
-      </header>
+      <NavigationBar></NavigationBar>
 
       <h1>
         Корзина <span>{totalItems} шт</span>

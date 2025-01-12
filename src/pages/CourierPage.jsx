@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getOrdersByCustomerId } from "../http/orderService";
 import axios from "axios";
 import "./CourierPage.css";
+import NavigationBar from "../components/NavigationBar";
 
 function CourierPage() {
   const navigate = useNavigate();
@@ -235,20 +235,7 @@ function CourierPage() {
 
   return (
     <div className="courier-page">
-      <header className="navbar">
-        <div className="navbar-left">
-          <button onClick={() => navigate("/about")}>О нас</button>
-          <span>+7 937 123 98 56</span>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate("/courier")}>Заказы</button>
-          {courierStatus.onShift && (
-            <button className="end-shift-button" onClick={handleEndShift}>
-              Закончить смену
-            </button>
-          )}
-        </div>
-      </header>
+      <NavigationBar courierStatus={courierStatus} handleEndShift={handleEndShift} />
 
       <div className="content">
         {loading ? (
@@ -275,6 +262,10 @@ function CourierPage() {
                   {/* Футер карточки */}
                   <div className="order-card-footer">
                     <hr className="divider-line" />
+                    {order.comment && (
+        <p className="order-comment">Комментарий: {order.comment}</p>
+      )}
+      <hr className="divider-line" />
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
                       <p>{formatOrderTime(order.createdAt)}</p>
@@ -323,6 +314,10 @@ function CourierPage() {
                   {/* Футер карточки */}
                   <div className="order-card-footer">
                     <hr className="divider-line" />
+                    {order.comment && (
+        <p className="order-comment">Комментарий: {order.comment}</p>
+      )}
+      <hr className="divider-line" />
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
                       <p>{formatOrderTime(order.orderTime)}</p>
@@ -357,15 +352,15 @@ function CourierPage() {
             </div>
           </div>
         ) : courierStatus.onShift && courierStatus.onDelivery ? (
-          <div>
-            <p>Нет доступных заказов.</p>
+          <div className="center-div">
+            <h2>Нет доступных заказов.</h2>
             <button className="end-delivery-button" onClick={handleEndDelivery}>
               Завершить доставку
             </button>
           </div>
           ) : !courierStatus.onShift ? (
-            <div>
-              <p>Вы не на смене.</p>
+            <div className="center-div">
+              <h2>Вы не на смене.</h2>
               <button className="start-shift-button" onClick={handleStartShift}>
                 Начать смену
               </button>

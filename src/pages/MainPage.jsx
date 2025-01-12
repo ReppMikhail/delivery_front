@@ -5,6 +5,7 @@ import { fetchDishes } from "../http/authService";
 import { useCart } from "../context/CartContext";
 import DishCard from "./DishCard";
 import ImageComponent from "./ImageComponent";
+import NavigationBar from "../components/NavigationBar";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const [tempMinPrice, setTempMinPrice] = useState("");
 const [tempMaxPrice, setTempMaxPrice] = useState("");
 const [tempExcludedIngredients, setTempExcludedIngredients] = useState([]);
 const [tempSelectedKitchens, setTempSelectedKitchens] = useState([]);
-
+const [searchText, setSearchText] = useState(""); // Состояние для строки поиска
 
 
   // Загрузка блюд
@@ -150,12 +151,17 @@ const [tempSelectedKitchens, setTempSelectedKitchens] = useState([]);
       // Проверка на кухни
     const isKitchenSelected =
     selectedKitchens.length === 0 || selectedKitchens.includes(dish.kitchen?.name);
+
+    const matchesSearch = dish.name
+    .toLowerCase()
+    .includes(searchText.toLowerCase()); // Проверка на соответствие строке поиска
   
     return (
       price >= min &&
       price <= max &&
       !containsExcludedIngredient &&
-      isKitchenSelected
+      isKitchenSelected &&
+      matchesSearch
     );
   });
   
@@ -221,17 +227,7 @@ const resetFilters = () => {
 
   return (
     <div className="main-page">
-      <header className="navbar">
-        <div className="navbar-left">
-          <button onClick={() => navigate("/main")}>Главная</button>
-          <button onClick={() => navigate("/about/system")}>О системе</button>
-          <span>+7 937 123 98 56</span>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate("/profile")}>Личный кабинет</button>
-          <button onClick={() => navigate("/cart")}>Корзина</button>
-        </div>
-      </header>
+      <NavigationBar />
 
       {/* Категории */}
       <div className="categories-container">
@@ -277,6 +273,19 @@ const resetFilters = () => {
               </div>
             )}
           </div>
+
+          <input
+            className="search-dishes-input"
+            type="text"
+            placeholder="Поиск блюда"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                getDishesByCategory();
+              }
+            }}
+          />
         </div>
       </div>
 

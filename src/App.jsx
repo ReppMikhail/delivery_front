@@ -15,6 +15,8 @@ import Couriers from "./pages/admin/Couriers";
 import Managers from "./pages/admin/Managers";
 import Orders from "./pages/admin/Orders";
 import Directory from "./pages/admin/Directory";
+import AboutSystem from "./pages/AboutSystem"; // Импорт компонента "О системе"
+import AboutDevelopers from "./pages/AboutDevelopers"; // Импорт компонента "О разработчиках"
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -56,6 +58,10 @@ function App() {
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      {/* Новые маршруты */}
+      <Route path="/about/system" element={<AboutSystem />} />
+      <Route path="/about/developers" element={<AboutDevelopers />} />
 
       <Route path="/admin" element={<ProtectedRoute role="ROLE_ADMIN"><AdminPage /></ProtectedRoute>} />
       <Route path="/clients" element={<ProtectedRoute role="ROLE_ADMIN"><Clients /></ProtectedRoute>} />

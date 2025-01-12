@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Profile.css";
 import { useCart } from "../context/CartContext";
+import ValidationHelper from "../components/ValidationHelper"; // Импорт валидации
+import NavigationBar from "../components/NavigationBar";
 
 
 const Profile = () => {
@@ -15,6 +17,18 @@ const Profile = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { setCartItemsDirectly } = useCart();
+  const [isFieldChanged, setIsFieldChanged] = useState({});
+  const [isAnyFieldChanged, setIsAnyFieldChanged] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const updateFieldChangeState = (fieldName, hasChanged) => {
+    const updatedFieldState = { ...isFieldChanged, [fieldName]: hasChanged };
+    setIsFieldChanged(updatedFieldState);
+
+    // Проверяем, изменено ли больше одного поля
+    const changedFields = Object.values(updatedFieldState).filter(Boolean);
+    setIsAnyFieldChanged(changedFields.length > 1);
+  };
 
   const handleRepeatOrder = (order) => {
     // Преобразуем элементы заказа в формат для корзины
@@ -132,11 +146,34 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
+    const updatedData = { ...userData, [name]: value };
+    setUserData(updatedData);
+
+    const hasChanged = updatedData[name] !== originalUserData[name];
+    updateFieldChangeState(name, hasChanged);
+
+    validateField(name, value);
   };
 
-  const hasChanged = (fieldName) => {
-    return userData[fieldName] !== originalUserData[fieldName];
+  const validateField = (name, value) => {
+    let error = null;
+    switch (name) {
+      case "fullName":
+        error = ValidationHelper.validateName(value);
+        break;
+      case "phone":
+        error = ValidationHelper.validatePhone(value);
+        break;
+      case "email":
+        error = ValidationHelper.validateEmail(value);
+        break;
+      case "address":
+        error = ValidationHelper.validateAddress(value);
+        break;
+      default:
+        break;
+    }
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
   };
 
   const handleOpenModal = (order) => {
@@ -149,12 +186,22 @@ const Profile = () => {
     setSelectedOrder(null);
   };
 
-  const handleSave = async (fieldName) => {
+  const handleSave = async () => {
+    // Проверка на наличие ошибок перед сохранением
+    const newErrors = {};
+    Object.keys(userData).forEach((field) => {
+      const error = validateField(field, userData[field]);
+      if (error) newErrors[field] = error;
+    });
+
+    if (Object.values(newErrors).some((error) => error)) {
+      setErrors(newErrors);
+      return;
+    }
     try {
       const authData = JSON.parse(localStorage.getItem("authData"));
       const { id } = userData;
 
-      // Подготовка данных для обновления
       const updatedData = {
         name: userData.fullName,
         username: userData.email,
@@ -162,7 +209,7 @@ const Profile = () => {
         address: userData.address,
       };
 
-      const response = await axios.put(
+      await axios.put(
         `http://localhost:8080/api/v1/users/${id}`,
         updatedData,
         {
@@ -173,14 +220,9 @@ const Profile = () => {
       );
 
       console.log("Данные успешно обновлены");
-
-      // Обновляем originalUserData
-      setOriginalUserData({
-        fullName: userData.fullName,
-        email: userData.email,
-        phone: userData.phone,
-        address: userData.address,
-      });
+      setOriginalUserData({ ...userData }); // Обновляем оригинальные данные
+      setIsFieldChanged({}); // Сбрасываем состояние изменений
+      setIsAnyFieldChanged(false); // Убираем индикатор изменений
     } catch (error) {
       console.error("Ошибка при обновлении данных:", error);
     }
@@ -198,25 +240,9 @@ const Profile = () => {
     );
   };
 
-  const handleViewOrder = (orderId) => {
-    // Симуляция загрузки данных заказа в корзину
-    console.log(`Загружаем заказ с ID: ${orderId}`);
-    navigate("/cart", { state: { orderId } });
-  };
-
   return (
     <div className="profile-page">
-      <header className="navbar">
-        <div className="navbar-left">
-          <button onClick={() => navigate("/main")}>Главная</button>
-          <button onClick={() => navigate("/about")}>О нас</button>
-          <span>+7 937 123 98 56</span>
-        </div>
-        <div className="navbar-right">
-          <button onClick={() => navigate("/profile")}>Личный кабинет</button>
-          <button onClick={() => navigate("/cart")}>Корзина</button>
-        </div>
-      </header>
+      <NavigationBar></NavigationBar>
 
       <h1>Личный кабинет</h1>
 
@@ -230,9 +256,10 @@ const Profile = () => {
             value={userData.fullName}
             onChange={handleInputChange}
           />
-          {hasChanged("fullName") && (
-            <button onClick={() => handleSave("fullName")}>Сохранить</button>
-          )}
+          {errors.fullName && <p className="error-message">{errors.fullName}</p>}
+{isFieldChanged.fullName && !isAnyFieldChanged && !errors.fullName &&(
+              <button onClick={handleSave}>Сохранить</button>
+            )}
 
           <h2>Телефон</h2>
           <input
@@ -241,9 +268,10 @@ const Profile = () => {
             value={userData.phone}
             onChange={handleInputChange}
           />
-          {hasChanged("phone") && (
-            <button onClick={() => handleSave("phone")}>Сохранить</button>
-          )}
+          {errors.phone && <p className="error-message">{errors.phone}</p>}
+            {isFieldChanged.phone && !isAnyFieldChanged && !errors.phone && (
+              <button onClick={handleSave}>Сохранить</button>
+            )}
 
           <h2>E-mail</h2>
           <input
@@ -252,9 +280,10 @@ const Profile = () => {
             value={userData.email}
             onChange={handleInputChange}
           />
-          {hasChanged("email") && (
-            <button onClick={() => handleSave("email")}>Сохранить</button>
-          )}
+          {errors.email && <p className="error-message">{errors.email}</p>}
+            {isFieldChanged.email && !isAnyFieldChanged && !errors.email && (
+              <button onClick={handleSave}>Сохранить</button>
+            )}
 
           <h2>Адрес</h2>
           <input
@@ -263,10 +292,21 @@ const Profile = () => {
             value={userData.address}
             onChange={handleInputChange}
           />
-          {hasChanged("address") && (
-            <button onClick={() => handleSave("address")}>Сохранить</button>
+          {errors.address && <p className="error-message">{errors.address}</p>}
+            {isFieldChanged.address && !isAnyFieldChanged && !errors.address && (
+              <button onClick={() => handleSave}>Сохранить</button>
+            )}
+
+{isAnyFieldChanged && (
+            <div className="save-all-container">
+              <button className="save-all-button" onClick={handleSave} disabled={Object.values(errors).some(Boolean)}>
+                Сохранить изменения
+              </button>
+            </div>
           )}
         </div>
+
+
 
         {/* Текущие заказы */}
         <div className="current-order">
