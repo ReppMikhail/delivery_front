@@ -12,6 +12,7 @@ import "./Admin.css";
 const CouriersPage = () => {
   const navigate = useNavigate();
   const [couriers, setCouriers] = useState([]);
+  const [couriersOnShift, setCouriersOnShift] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -32,8 +33,10 @@ const CouriersPage = () => {
 
   const loadCouriers = async () => {
     try {
-      const data = await getAllCouriers();
-      setCouriers(data);
+      const couriersData = await getAllCouriers();
+      const couriersOnShiftData = await getCouriersOnShift();
+      setCouriers(couriersData);
+      setCouriersOnShift(couriersOnShiftData);
     } catch (error) {
       console.error("Ошибка загрузки курьеров:", error);
     }
@@ -147,23 +150,34 @@ const CouriersPage = () => {
       <button onClick={handleAddClick}>Добавить курьера</button>
 
       <ul className="courier-list">
-        {couriers.map((courier) => (
-          <li key={courier.id} className="courier-item">
-            <div>
-              <p>ID: {courier.id}</p>
-              <strong>{courier.name}</strong>
-              <p>Логин: {courier.username}</p>
-              <p>Телефон: {courier.phone}</p>
-              <p>Адрес: {courier.address}</p>
-              <p>Роли: {courier.roles.join(", ")}</p>
-            </div>
-            <div>
-              <button onClick={() => handleEditClick(courier)}>✏️</button>
-              <button onClick={() => handleDeleteClick(courier.id)}>❌</button>
-            </div>
-          </li>
-        ))}
+        {couriers.map((courier) => {
+          const courierShiftData = couriersOnShift.find((c) => c.userId === courier.id);
+          return (
+            <li key={courier.id} className="courier-item">
+              <div>
+                <p>ID: {courier.id}</p>
+                <strong>{courier.name}</strong>
+                <p>Логин: {courier.username}</p>
+                <p>Телефон: {courier.phone}</p>
+                <p>Адрес: {courier.address}</p>
+                <p>Роли: {courier.roles.join(", ")}</p>
+                {courierShiftData ? (
+                  <div>
+                    <p>На смене: {courierShiftData.onShift ? "Да" : "Нет"}</p>
+                    <p>На доставке: {courierShiftData.onDelivery ? "Да" : "Нет"}</p>
+                  </div>
+                  ) : (<p>На смене: Нет</p>)
+                }
+              </div>
+              <div>
+                <button onClick={() => handleEditClick(courier)}>✏️</button>
+                <button onClick={() => handleDeleteClick(courier.id)}>❌</button>
+              </div>
+            </li>
+          );
+        })}
       </ul>
+
 
       {showForm && (
         <div className="courier-form">
