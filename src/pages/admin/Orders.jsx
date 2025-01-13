@@ -83,23 +83,27 @@ const OrdersPage = () => {
         <button onClick={() => navigate("/couriers")}>Курьеры</button>
         <button onClick={() => navigate("/orders")}>Заказы</button>
         <button onClick={() => navigate("/directory")}>Справочник</button>
-        {/* Выпадающее меню "О нас" */}
+          {/* Выпадающее меню "О нас" */}
         <button
-            onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
-          >
-            О нас
-          </button>
-          {aboutDropdownVisible && (
-            <div className="dropdown-popup">
-              <button onClick={() => navigate("/about/system")}>
-                О системе
-              </button>
-              <button onClick={() => navigate("/about/developers")}>
-                О разработчиках
-              </button>
-            </div>
-          )}
-        <span>+7 937 123 98 56</span>
+          onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
+        >
+          О нас
+        </button>
+        {aboutDropdownVisible && (
+          <div className="dropdown-popup">
+            <button onClick={() => navigate("/about/system")}>
+              О системе
+            </button>
+            <button onClick={() => navigate("/about/developers")}>
+              О разработчиках
+            </button>
+          </div>
+        )}
+        <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
       </header>
       <h2>Список заказов</h2>
       <ul className="orders-list">

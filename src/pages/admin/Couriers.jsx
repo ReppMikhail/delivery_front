@@ -121,6 +121,7 @@ const CouriersPage = () => {
         <button onClick={() => navigate("/couriers")}>Курьеры</button>
         <button onClick={() => navigate("/orders")}>Заказы</button>
         <button onClick={() => navigate("/directory")}>Справочник</button>
+          {/* Выпадающее меню "О нас" */}
         <button
           onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
         >
@@ -136,7 +137,11 @@ const CouriersPage = () => {
             </button>
           </div>
         )}
-        <span>+7 937 123 98 56</span>
+        <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
       </header>
       <h2>Список курьеров</h2>
       <button onClick={handleAddClick}>Добавить курьера</button>
