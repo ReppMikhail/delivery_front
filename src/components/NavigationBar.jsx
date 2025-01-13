@@ -48,6 +48,11 @@ const NavigationBar = ({ courierStatus, handleEndShift }) => {
               Закончить смену
             </button>
           )}
+          <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
         </div>
       </header>
     );
@@ -76,6 +81,11 @@ const NavigationBar = ({ courierStatus, handleEndShift }) => {
         <div className="navbar-right">
           <button onClick={() => navigate("/profile")}>Личный кабинет</button>
           <button onClick={() => navigate("/cart")}>Корзина</button>
+          <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
         </div>
       </header>
     );
