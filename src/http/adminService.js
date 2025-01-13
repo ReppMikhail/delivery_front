@@ -172,16 +172,18 @@ export const getUserById = async (id) => {
   }
 };
 
-// Функция для получения курьера по его id
-export const getCourierById = async (courierId) => {
-  try {
-    const response = await axiosInstance.get(`${API_BASE_URL}/couriers/${courierId}`);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : new Error("Network Error");
-  }
-};
+/*              ВРОДЕ НИГДЕ НЕ ИСПОЛЬЗУЕТСЯ              */
+// // Функция для получения курьера по его id
+// export const getCourierById = async (courierId) => {
+//   try {
+//     const response = await axiosInstance.get(`${API_BASE_URL}/couriers/${courierId}`);
+//     return response.data;
+//   } catch (error) {
+//     throw error.response ? error.response.data : new Error("Network Error");
+//   }
+// };
 
+// Функция для получения курьеров на смене
 export const getCouriersOnShift = async () => {
   try {
     const response = await axiosInstance.get(`${API_BASE_URL}/couriers/all-on-shift`);
