@@ -4,7 +4,12 @@ import {jwtDecode} from "jwt-decode"; // Исправлено: jwtDecode исп�
 import PropTypes from "prop-types";
 import "./NavigationBar.css";
 
-const NavigationBar = ({ courierStatus, handleEndShift }) => {
+const NavigationBar = ({
+  courierStatus,
+  handleEndShift,
+  showOnlyActiveOrders,
+  setShowOnlyActiveOrders, // Новый проп для управления переключателем
+}) => {
   const navigate = useNavigate();
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const authData = JSON.parse(localStorage.getItem("authData"));
@@ -21,6 +26,7 @@ const NavigationBar = ({ courierStatus, handleEndShift }) => {
 
   const isCustomer = roles.includes("ROLE_CUSTOMER");
   const isCourier = roles.includes("ROLE_COURIER");
+  const isManager = roles.includes("ROLE_MANAGER");
 
   if (isCourier) {
     return (
@@ -48,6 +54,50 @@ const NavigationBar = ({ courierStatus, handleEndShift }) => {
               Закончить смену
             </button>
           )}
+          <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
+        </div>
+      </header>
+    );
+  }
+
+  if (isManager) {
+    return (
+      <header className="navbar">
+        <div className="navbar-left">
+          <button onClick={() => navigate("/manager")}>Заказы</button>
+          <div
+            className="dropdown-container"
+            onMouseEnter={() => setDropdownVisible(true)}
+            onMouseLeave={() => setDropdownVisible(false)}
+          >
+            <button className="dropdown-button">О нас</button>
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button onClick={() => navigate("/about/system")}>О системе</button>
+                <button onClick={() => navigate("/about/developers")}>О разработчиках</button>
+              </div>
+            )}
+          </div>
+          <span>+7 937 123 98 56</span>
+        </div>
+        <div className="navbar-right">
+        <div className="manager-toggle-switch">
+          <label className="manager-switch">
+            <input
+              type="checkbox"
+              checked={showOnlyActiveOrders}
+              onChange={() => setShowOnlyActiveOrders(!showOnlyActiveOrders)}
+            />
+            <span className="manager-slider round"></span>
+          </label>
+          <span className="manager-toggle-label">
+             Показать только активные
+          </span>
+        </div>
           <button onClick={() => {
           localStorage.clear(); // Очищает local storage
           navigate("/"); // Перенаправляет на главную страницу

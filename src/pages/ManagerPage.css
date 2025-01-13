@@ -1,94 +1,203 @@
 .manager-container {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
   padding: 20px;
-  background-color: #f5f5f5;
-  height: auto;
+  background-color: #f9f9f9;
   font-family: "Roboto", sans-serif;
 }
 
 .orders-section,
 .couriers-section {
-  width: 48%;
+  flex: 1;
+  min-width: 300px;
+  max-width: 48%;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 20px;
 }
 
-.order-card,
-.courier-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
+.orders-section h2,
+.couriers-section h2 {
+  font-size: 20px;
+  color: #333;
   margin-bottom: 15px;
-  padding: 15px;
-  background: #fff;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
 }
 
-.order-header {
+.orders-section .order-card,
+.couriers-section .courier-card  {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 20px;
+  padding-bottom: 10px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.orders-section .order-card:hover,
+.couriers-section .courier-card:hover  {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.order-header,
+.courier-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
 }
 
 .status {
-  padding: 5px 10px;
-  border-radius: 15px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status.processing,
+.status.preparing {
+  background: #ffb74d; /* Оранжевый */
   color: #fff;
 }
 
-.status.pending {
-  background: #ff9800;
-}
-
 .status.assigned {
-  background: #4caf50;
+  background: #64b5f6; /* Синий */
+  color: #fff;
 }
 
-.status.free {
-  background: #4caf50;
+.status.in-transit {
+  background: #81c784; /* Зелёный */
+  color: #fff;
 }
 
-.status.busy {
-  background: #9e9e9e;
+.status.canceled,
+.status.delivered {
+  background: #b0bec5; /* Серый */
+  color: #fff;
 }
 
-.order-footer {
-  display: flex;
-  justify-content: space-between;
+
+.orders-section .order-details ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.orders-section .order-details ul li {
   font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.order-comment-text {
+  font-style: italic;
   color: #757575;
   margin-top: 10px;
 }
 
-.order-actions {
+/* Уникальный класс для футера заказа */
+.orders-section .order-footer {
   display: flex;
-  justify-content: space-between;
+  gap: 15px; /* Добавляем расстояние между строками */
+  font-size: 14px;
+  color: #545454;
+}
+
+.orders-section .order-actions,
+.orders-section .courier-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 15px;
 }
 
-button.accept {
-  background-color: #4caf50;
+/* Уникальные стили для кнопок только на странице менеджера */
+button.manager-accept {
+  background-color: #10bb1692;
   color: white;
   border: none;
-  padding: 10px 20px;
   border-radius: 5px;
+  padding: 8px 15px;
   cursor: pointer;
+  transition: background-color 0.2s;
+  margin-right: 25px;
 }
 
-button.assign{
+button.manager-accept:hover {
+  background-color: #10bb16ea;
+}
+
+button.manager-assign {
   background-color: #284dd1;
   color: white;
   border: none;
-  padding: 10px 20px;
   border-radius: 5px;
+  padding: 8px 15px;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-button.reject {
-  background-color: #f44336;
+button.manager-assign:hover {
+  background-color: #1a38a6;
+}
+
+button.manager-reject {
+  background-color: #ff11007c;
   color: white;
   border: none;
-  padding: 10px 20px;
   border-radius: 5px;
+  padding: 8px 15px;
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button.manager-reject:hover {
+  background-color: #ff1100b8;
+}
+
+button.manager-assign-to-courier,
+button.manager-start-delivery {
+  background-color: #0288d1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-right: 25px;
+}
+
+button.manager-assign-to-courier:hover,
+button.manager-start-delivery:hover {
+  background-color: #02669d;
+}
+
+button.manager-cancel-assign {
+  background-color: #ffb300;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button.manager-cancel-assign:hover {
+  background-color: #e69100;
+}
+
+.error {
+  color: #f44336;
+  background: #ffebee;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
 }

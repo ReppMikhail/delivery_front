@@ -105,7 +105,7 @@ const Profile = () => {
         const userOrders = allOrders.filter(
           (order) =>
             order.customerId === userId &&
-            order.status !== "отменён" &&
+            order.status !== "отменен" &&
             order.status !== "доставлен"
         );
         setCurrentOrders(userOrders);

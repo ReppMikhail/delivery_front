@@ -21,7 +21,7 @@
   padding: 0;
 }
 
-.order-card {
+.orders-list .order-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Разделяем содержимое на верх и низ */
@@ -33,7 +33,7 @@
   height: 100%; /* Все карточки будут одинаковой высоты */
 }
 
-.order-card > h3 {
+.orders-list .order-card > h3 {
   text-align: center;
   margin-top: 0px;
 }
@@ -57,6 +57,10 @@
 
 .order-card-content {
   flex-grow: 1; /* Расширяем основное содержимое */
+}
+
+.order-card-content .order-items{
+  text-align: center;
 }
 
 .order-card-footer {
@@ -147,7 +151,7 @@
   text-align: center;
 }
 
-.order-comment {
+.order-card-footer .order-comment {
   font-style: italic;
   color: #555;
   margin-top: 10px;

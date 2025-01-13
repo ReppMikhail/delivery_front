@@ -262,10 +262,15 @@ function CourierPage() {
                   {/* Футер карточки */}
                   <div className="order-card-footer">
                     <hr className="divider-line" />
+                   
                     {order.comment && (
+                       <div>
         <p className="order-comment">Комментарий: {order.comment}</p>
+
+<hr className="divider-line" />
+</div>
       )}
-      <hr className="divider-line" />
+
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
                       <p>{formatOrderTime(order.createdAt)}</p>
@@ -315,9 +320,13 @@ function CourierPage() {
                   <div className="order-card-footer">
                     <hr className="divider-line" />
                     {order.comment && (
+                       <div>
         <p className="order-comment">Комментарий: {order.comment}</p>
+
+<hr className="divider-line" />
+</div>
       )}
-      <hr className="divider-line" />
+
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
                       <p>{formatOrderTime(order.orderTime)}</p>
