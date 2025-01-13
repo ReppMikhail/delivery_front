@@ -183,29 +183,33 @@ const AdminPage = () => {
   return (
     <div className="admin-page">
       <header className="navbar">
-          <button onClick={() => navigate("/admin")}>Блюда</button>
-          <button onClick={() => navigate("/clients")}>Клиенты</button>
-          <button onClick={() => navigate("/managers")}>Менеджеры</button>
-          <button onClick={() => navigate("/couriers")}>Курьеры</button>
-          <button onClick={() => navigate("/orders")}>Заказы</button>
-          <button onClick={() => navigate("/directory")}>Справочник</button>
+        <button onClick={() => navigate("/admin")}>Блюда</button>
+        <button onClick={() => navigate("/clients")}>Клиенты</button>
+        <button onClick={() => navigate("/managers")}>Менеджеры</button>
+        <button onClick={() => navigate("/couriers")}>Курьеры</button>
+        <button onClick={() => navigate("/orders")}>Заказы</button>
+        <button onClick={() => navigate("/directory")}>Справочник</button>
           {/* Выпадающее меню "О нас" */}
-          <button
-            onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
-          >
-            О нас
-          </button>
-          {aboutDropdownVisible && (
-            <div className="dropdown-popup">
-              <button onClick={() => navigate("/about/system")}>
-                О системе
-              </button>
-              <button onClick={() => navigate("/about/developers")}>
-                О разработчиках
-              </button>
-            </div>
-          )}
-          <span>+7 937 123 98 56</span>
+        <button
+          onClick={() => setAboutDropdownVisible(!aboutDropdownVisible)}
+        >
+          О нас
+        </button>
+        {aboutDropdownVisible && (
+          <div className="dropdown-popup">
+            <button onClick={() => navigate("/about/system")}>
+              О системе
+            </button>
+            <button onClick={() => navigate("/about/developers")}>
+              О разработчиках
+            </button>
+          </div>
+        )}
+        <button onClick={() => {
+          localStorage.clear(); // Очищает local storage
+          navigate("/"); // Перенаправляет на главную страницу
+          }}>Выйти
+        </button>
       </header>
       
       <div className="admin-content">
