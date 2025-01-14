@@ -11,9 +11,10 @@ const DirectoryPage = () => {
     { id: 0, name: "Закуска" },
     { id: 1, name: "Салат" },
     { id: 2, name: "Суп" },
-    { id: 3, name: "Горячее" },
+    { id: 3, name: "Основное блюдо" },
     { id: 4, name: "Десерт" },
     { id: 5, name: "Напиток" },
+    { id: 6, name: "Гарнир" },
   ];
   const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false);
 

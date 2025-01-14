@@ -173,8 +173,10 @@ const NavigationBar = ({
           <button onClick={() => navigate("/couriers")}>Курьеры</button>
           <button onClick={() => navigate("/orders")}>Заказы</button>
           <button onClick={() => navigate("/directory")}>Справочник</button>
+          <button onClick={() => navigate("/ingridients")}>Ингредиенты</button>
         </div>
-        <div className="navbar-left">
+        <div className="navbar-right">
+        <button onClick={() => navigate("/adminProfile")}>Личный кабинет</button>
           <div
             className="dropdown-container"
             onMouseEnter={() => setDropdownVisible(true)}

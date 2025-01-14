@@ -193,22 +193,23 @@ const Profile = () => {
       const error = validateField(field, userData[field]);
       if (error) newErrors[field] = error;
     });
-
+  
     if (Object.values(newErrors).some((error) => error)) {
       setErrors(newErrors);
       return;
     }
+  
     try {
       const authData = JSON.parse(localStorage.getItem("authData"));
       const { id } = userData;
-
+  
       const updatedData = {
         name: userData.fullName,
         username: userData.email,
         phone: userData.phone,
         address: userData.address,
       };
-
+  
       await axios.put(
         `http://localhost:8080/api/v1/users/${id}`,
         updatedData,
@@ -218,15 +219,26 @@ const Profile = () => {
           },
         }
       );
-
+  
       console.log("Данные успешно обновлены");
-      setOriginalUserData({ ...userData }); // Обновляем оригинальные данные
-      setIsFieldChanged({}); // Сбрасываем состояние изменений
-      setIsAnyFieldChanged(false); // Убираем индикатор изменений
+  
+      // Проверяем, изменился ли e-mail
+      if (userData.email !== originalUserData.email) {
+        // Если e-mail изменился, перенаправляем пользователя на страницу авторизации
+        localStorage.removeItem("authData"); // Удаляем данные авторизации
+        alert("Логин успешно обновлен! Выполните вход с новым логином.");
+        navigate("/"); // Перенаправление на страницу авторизации
+      } else {
+        // Обновляем оригинальные данные и сбрасываем индикаторы изменений
+        setOriginalUserData({ ...userData });
+        setIsFieldChanged({});
+        setIsAnyFieldChanged(false);
+      }
     } catch (error) {
       console.error("Ошибка при обновлении данных:", error);
     }
   };
+  
 
   const handleNextOrder = () => {
     setCurrentOrderIndex((prevIndex) =>

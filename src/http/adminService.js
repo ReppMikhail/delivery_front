@@ -32,6 +32,36 @@ export const getAllIngredients = async () => {
     }
   };
 
+  // Обновить ингредиент
+export const putIngredient = async (name) => {
+  try {
+    const response = await axiosInstance.put(`${API_BASE_URL}/ingredients`, name);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : new Error("Network Error");
+  }
+};
+
+  // Добавить ингредиент
+  export const postIngredient = async (name) => {
+    try {
+      const response = await axiosInstance.post(`${API_BASE_URL}/ingredients`, name);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+  
+    // Удалить ингредиент
+    export const deleteIngredient = async (id) => {
+      try {
+        const response = await axiosInstance.delete(`${API_BASE_URL}/ingredients/${id}`);
+        return response.data;
+      } catch (error) {
+        throw error.response ? error.response.data : new Error("Network Error");
+      }
+    };
+
 // Получить список всех видов кухни
 export const getAllKitchens = async () => {
   try {
@@ -171,6 +201,7 @@ export const getUserById = async (id) => {
     throw error.response ? error.response.data : new Error("Network Error");
   }
 };
+
 
 /*              ВРОДЕ НИГДЕ НЕ ИСПОЛЬЗУЕТСЯ              */
 // // Функция для получения курьера по его id
