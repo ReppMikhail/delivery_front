@@ -228,10 +228,10 @@ function CourierPage() {
     }
   };
 
-  const formatOrderTime = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
+  // const formatOrderTime = (isoString) => {
+  //   const date = new Date(isoString);
+  //   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  // };
 
   return (
     <div className="courier-page">
@@ -273,7 +273,7 @@ function CourierPage() {
 
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
-                      <p>{formatOrderTime(order.createdAt)}</p>
+                      <p>{order.createdAt}</p>
                       <p>
                         {order.orderItems.reduce(
                           (acc, item) =>
@@ -329,7 +329,7 @@ function CourierPage() {
 
                     <div className="order-details-row">
                       <p>{order.totalPrice.toFixed(2)} ₽</p>
-                      <p>{formatOrderTime(order.orderTime)}</p>
+                      <p>{order.createdAt}</p>
                       <p>
                         {order.orderItems.reduce(
                           (acc, item) =>
