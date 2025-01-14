@@ -70,7 +70,6 @@ const filteredOrders = orders.filter((order) =>
           order.id === orderId ? { ...order, status: "готовится" } : order
         )
       );
-      alert(`Заказ ${orderId} помечен как \"готовится\"`);
     } catch (err) {
       alert(err.message || "Ошибка при обновлении заказа");
     }
@@ -85,7 +84,6 @@ const filteredOrders = orders.filter((order) =>
           order.id === orderId ? { ...order, status: "отменен" } : order
         )
       );
-      alert(`Заказ ${orderId} отменен`);
     } catch (err) {
       alert(err.message || "Ошибка при отмене заказа");
     }
@@ -103,7 +101,6 @@ const filteredOrders = orders.filter((order) =>
         )
       );
       setAssigningOrderId(null);
-      alert(`Курьер ${courierId} назначен на заказ ${orderId}`);
     } catch (err) {
       alert(err.message || "Ошибка при назначении курьера");
     }
@@ -128,8 +125,6 @@ const filteredOrders = orders.filter((order) =>
             : order
         )
       );
-
-      alert(`Курьер ${courierId} начал доставку.`);
     } catch (err) {
       alert(err.message || "Ошибка при начале доставки");
     }

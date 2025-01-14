@@ -136,7 +136,7 @@ button.manager-accept:hover {
 }
 
 button.manager-assign {
-  background-color: #284dd1;
+  background-color: #0288d1;
   color: white;
   border: none;
   border-radius: 5px;
@@ -146,7 +146,7 @@ button.manager-assign {
 }
 
 button.manager-assign:hover {
-  background-color: #1a38a6;
+  background-color: #02669d;
 }
 
 button.manager-reject {

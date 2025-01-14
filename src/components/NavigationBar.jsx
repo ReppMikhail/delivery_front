@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode"; // Исправлено: jwtDecode используется без деструктуризации
+import { jwtDecode } from "jwt-decode"; // Исправлено: jwtDecode используется без деструктуризации
 import PropTypes from "prop-types";
 import "./NavigationBar.css";
 
@@ -27,6 +27,7 @@ const NavigationBar = ({
   const isCustomer = roles.includes("ROLE_CUSTOMER");
   const isCourier = roles.includes("ROLE_COURIER");
   const isManager = roles.includes("ROLE_MANAGER");
+  const isAdmin = roles.includes("ROLE_ADMIN");
 
   if (isCourier) {
     return (
@@ -41,8 +42,12 @@ const NavigationBar = ({
             <button className="dropdown-button">О нас</button>
             {dropdownVisible && (
               <div className="dropdown-menu">
-                <button onClick={() => navigate("/about/system")}>О системе</button>
-                <button onClick={() => navigate("/about/developers")}>О разработчиках</button>
+                <button onClick={() => navigate("/about/system")}>
+                  О системе
+                </button>
+                <button onClick={() => navigate("/about/developers")}>
+                  О разработчиках
+                </button>
               </div>
             )}
           </div>
@@ -54,11 +59,14 @@ const NavigationBar = ({
               Закончить смену
             </button>
           )}
-          <button onClick={() => {
-          localStorage.clear(); // Очищает local storage
-          navigate("/"); // Перенаправляет на главную страницу
-          }}>Выйти
-        </button>
+          <button
+            onClick={() => {
+              localStorage.clear(); // Очищает local storage
+              navigate("/"); // Перенаправляет на главную страницу
+            }}
+          >
+            Выйти
+          </button>
         </div>
       </header>
     );
@@ -77,32 +85,39 @@ const NavigationBar = ({
             <button className="dropdown-button">О нас</button>
             {dropdownVisible && (
               <div className="dropdown-menu">
-                <button onClick={() => navigate("/about/system")}>О системе</button>
-                <button onClick={() => navigate("/about/developers")}>О разработчиках</button>
+                <button onClick={() => navigate("/about/system")}>
+                  О системе
+                </button>
+                <button onClick={() => navigate("/about/developers")}>
+                  О разработчиках
+                </button>
               </div>
             )}
           </div>
           <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
-        <div className="manager-toggle-switch">
-          <label className="manager-switch">
-            <input
-              type="checkbox"
-              checked={showOnlyActiveOrders}
-              onChange={() => setShowOnlyActiveOrders(!showOnlyActiveOrders)}
-            />
-            <span className="manager-slider round"></span>
-          </label>
-          <span className="manager-toggle-label">
-             Показать только активные
-          </span>
-        </div>
-          <button onClick={() => {
-          localStorage.clear(); // Очищает local storage
-          navigate("/"); // Перенаправляет на главную страницу
-          }}>Выйти
-        </button>
+          <div className="manager-toggle-switch">
+            <label className="manager-switch">
+              <input
+                type="checkbox"
+                checked={showOnlyActiveOrders}
+                onChange={() => setShowOnlyActiveOrders(!showOnlyActiveOrders)}
+              />
+              <span className="manager-slider round"></span>
+            </label>
+            <span className="manager-toggle-label">
+              Показать только активные
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              localStorage.clear(); // Очищает local storage
+              navigate("/"); // Перенаправляет на главную страницу
+            }}
+          >
+            Выйти
+          </button>
         </div>
       </header>
     );
@@ -121,8 +136,12 @@ const NavigationBar = ({
             <button className="dropdown-button">О нас</button>
             {dropdownVisible && (
               <div className="dropdown-menu">
-                <button onClick={() => navigate("/about/system")}>О системе</button>
-                <button onClick={() => navigate("/about/developers")}>О разработчиках</button>
+                <button onClick={() => navigate("/about/system")}>
+                  О системе
+                </button>
+                <button onClick={() => navigate("/about/developers")}>
+                  О разработчиках
+                </button>
               </div>
             )}
           </div>
@@ -131,11 +150,56 @@ const NavigationBar = ({
         <div className="navbar-right">
           <button onClick={() => navigate("/profile")}>Личный кабинет</button>
           <button onClick={() => navigate("/cart")}>Корзина</button>
-          <button onClick={() => {
-          localStorage.clear(); // Очищает local storage
-          navigate("/"); // Перенаправляет на главную страницу
-          }}>Выйти
-        </button>
+          <button
+            onClick={() => {
+              localStorage.clear(); // Очищает local storage
+              navigate("/"); // Перенаправляет на главную страницу
+            }}
+          >
+            Выйти
+          </button>
+        </div>
+      </header>
+    );
+  }
+
+  if (isAdmin) {
+    return (
+      <header className="navbar">
+        <div className="navbar-left">
+          <button onClick={() => navigate("/admin")}>Блюда</button>
+          <button onClick={() => navigate("/clients")}>Клиенты</button>
+          <button onClick={() => navigate("/managers")}>Менеджеры</button>
+          <button onClick={() => navigate("/couriers")}>Курьеры</button>
+          <button onClick={() => navigate("/orders")}>Заказы</button>
+          <button onClick={() => navigate("/directory")}>Справочник</button>
+        </div>
+        <div className="navbar-left">
+          <div
+            className="dropdown-container"
+            onMouseEnter={() => setDropdownVisible(true)}
+            onMouseLeave={() => setDropdownVisible(false)}
+          >
+            <button className="dropdown-button">О нас</button>
+            {dropdownVisible && (
+              <div className="dropdown-menu">
+                <button onClick={() => navigate("/about/system")}>
+                  О системе
+                </button>
+                <button onClick={() => navigate("/about/developers")}>
+                  О разработчиках
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              localStorage.clear(); // Очищает local storage
+              navigate("/"); // Перенаправляет на главную страницу
+            }}
+          >
+            Выйти
+          </button>
         </div>
       </header>
     );

@@ -8,140 +8,225 @@
   background-color: #f8f8f8;
   color: #333;
 }
-
-.admin-page .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 10px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.admin-page .navbar button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  margin-right: 10px;
-  padding: 5px 10px;
-  color: #333;
-}
-
-.admin-page .navbar button:hover {
-  background-color: #e6e6e6;
-  border-radius: 4px;
-}
-
-.admin-page .navbar span {
-  font-weight: bold;
-  color: #555;
-}
-
-.admin-page .dropdown-popup {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ccc;
-  padding: 5px;
-  border-radius: 4px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-
 .admin-page .admin-content {
   padding: 20px;
+  padding-top: 10px;
 }
 
-/* Список блюд */
+.admin-page .admin-content>div>h2 {
+  margin-top: 0px;
+}
+
+/* Стили для карточек */
 .admin-page .menu-list {
-  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 карточки в строке */
+  gap: 20px; /* Расстояние между карточками */
   padding: 0;
-  margin: 0;
+  margin: 20px 0;
 }
 
 .admin-page .menu-item {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: flex-start;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative; /* Устанавливаем относительное позиционирование */
+}
+
+.admin-page .menu-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
 }
 
 .admin-page .menu-item div {
   flex: 1;
 }
 
-.admin-page .menu-item p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #555;
+.admin-page .menu-item .action-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
 }
 
-.admin-page .menu-item strong {
-  font-size: 16px;
-  color: #333;
-}
-
-.admin-page .menu-item button {
+.admin-page .menu-item .action-buttons button {
   background-color: transparent;
   border: none;
   cursor: pointer;
-  font-size: 18px;
-  margin: 0 5px;
+  font-size: 20px;
   color: #888;
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-page .menu-item .action-buttons button:hover {
+  color: #2c3e50;
+  transform: scale(1.1);
+}
+
+
+.admin-page .menu-item p {
+  margin: 5px 0;
+  font-size: 15px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.admin-page .menu-item strong {
+  font-size: 18px;
+  color: #2c3e50;
 }
 
 .admin-page .menu-item button:hover {
-  color: #555;
+  color: #2c3e50;
+  transform: scale(1.1);
 }
+
+/* Стили для кнопки загрузки изображения */
+.admin-page .menu-item .upload-container {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.admin-page .menu-item .upload-container input[type="file"] {
+  display: none; /* Скрываем стандартное поле */
+}
+
+.admin-page .menu-item .upload-container .choise-image-button {
+  background-color: #3498db;
+  color: #fff;
+  padding: 10px 5px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.2s ease;
+  text-align: center;
+}
+
+.admin-page .menu-item .upload-container .choise-image-button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+.admin-page .menu-item .upload-container button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 5px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-page .menu-item .upload-container button:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+
+.admin-page .menu-item .upload-container .file-name {
+  font-size: 14px;
+  color: #555;
+  font-style: italic;
+}
+
 
 /* Форма добавления/редактирования */
 .admin-page .menu-form {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  padding: 25px;
   margin-top: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .admin-page .menu-form h3 {
   margin-top: 0;
-  font-size: 18px;
-  color: #333;
+  font-size: 24px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.menu-form .form-group {
+  margin-bottom: 5px;
+}
+
+.menu-form label {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .menu-form input,
 .menu-form select,
 .menu-form textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 15px;
   border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  resize: none; /* Отключение изменения размера textarea */
+}
+
+.menu-form input:focus,
+.menu-form select:focus,
+.menu-form textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.menu-form textarea {
+  font-family: Arial, sans-serif; /* Совместимый шрифт для всех полей */
 }
 
 .menu-form input[type="file"] {
   padding: 0;
 }
 
+.menu-form .form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
 .menu-form button {
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 12px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .menu-form button:hover {
   background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.menu-form .checkbox-group h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #2c3e50; 
 }
 
 .menu-form .checkbox-group {
@@ -152,11 +237,16 @@
 
 .menu-form .checkbox-group label {
   font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
 }
 
 .menu-form .checkbox-group input {
   margin-right: 5px;
 }
+
 
 /* Кнопки в заголовке */
 .admin-page button:hover {
@@ -164,21 +254,20 @@
 }
 
 /* Кнопка добавления блюда */
-.admin-page button {
+.admin-add-dish-button {
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 15px;
   border-radius: 5px;
   cursor: pointer;
+  margin-top: 5px;
+  margin-left: 20px;
 }
 
-.admin-page button:hover {
+.admin-add-dish-button:hover {
   background-color: #45a049;
 }
-
-
-
 
 .admin-page .directory-container {
   display: flex;
@@ -212,118 +301,3 @@
 .admin-page .directory-item p {
   margin: 5px 0;
 }
-
-
-
-
-
-
-
-
-
-/* body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5;
-}
-
-.admin-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ccc;
-}
-
-
-
-
-
-
-
-header.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.admin-page {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  
-  
-  .admin-header h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  .search-bar input {
-    padding: 5px 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .add-button {
-    padding: 5px 10px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #4caf50;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .add-button:hover {
-    background-color: #45a049;
-  }
-  
-  .dishes-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 18px;
-    text-align: left;
-  }
-  
-  .dishes-table thead {
-    background-color: #f5f5f5;
-  }
-  
-  .dishes-table th,
-  .dishes-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
-  }
-  
-  .dishes-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  .dishes-table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .delete-button {
-    background-color: #e53935;
-    color: #fff;
-    border: none;
-    padding: 5px 8px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .delete-button:hover {
-    background-color: #d32f2f;
-  } */
