@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAllMenuItems,
@@ -11,6 +11,7 @@ import {
 } from "../../http/adminService";
 import "./Admin.css";
 import NavigationBar from "../../components/NavigationBar";
+import ImageComponent from "../ImageComponent";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -34,13 +35,18 @@ const AdminPage = () => {
   const [editItemId, setEditItemId] = useState(null);
   const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false); // Состояние для выпадающего списка "О нас"
   const [fileNames, setFileNames] = useState({});
+  const dishFormRef = useRef(null);
 
   // Загрузка данных
   useEffect(() => {
     loadMenuItems();
     loadIngredients();
     loadKitchens();
-  }, []);
+    if (showForm && dishFormRef.current) {
+      // Прокручиваем к форме только когда она отображена
+      dishFormRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [showForm]);
 
   const loadMenuItems = async () => {
     try {
@@ -126,7 +132,7 @@ const AdminPage = () => {
   };
 
   const handleAddClick = () => {
-    setShowForm(true);
+    setShowForm(true); // Показать форму
     setFormData({
       name: "",
       description: "",
@@ -138,6 +144,7 @@ const AdminPage = () => {
       ingredients: [],
     });
     setEditMode(false);
+    scrollToForm(); // Прокручиваем к форме при добавлении
   };
 
   const handleEditClick = (item) => {
@@ -149,6 +156,7 @@ const AdminPage = () => {
     });
     setEditMode(true);
     setEditItemId(item.id);
+    scrollToForm(); // Прокручиваем к форме при добавлении
   };
 
   const handleDeleteClick = async (id) => {
@@ -160,11 +168,39 @@ const AdminPage = () => {
     }
   };
 
+  const checkIfNameExists = async (name) => {
+    try {
+      const data = await getAllMenuItems(); // Получаем все блюда
+      const itemExists = data.some(
+        (item) => item.name.toLowerCase() === name.toLowerCase()
+      ); // Сравниваем название без учета регистра
+      return itemExists;
+    } catch (error) {
+      console.error("Ошибка при проверке существующего названия:", error);
+      return false; // В случае ошибки возвращаем false
+    }
+  };
+
   const handleFormSubmit = async () => {
+    const nameExists = await checkIfNameExists(formData.name);
+
+    if (
+      nameExists &&
+      (!editMode ||
+        (editMode &&
+          formData.name !==
+            menuItems.find((item) => item.id === editItemId).name))
+    ) {
+      alert(
+        "Блюдо с таким названием уже существует. Пожалуйста, выберите другое название."
+      );
+      return; // Прерываем выполнение, если название уже существует
+    }
+
     try {
       // Форматируем ингредиенты в ожидаемый сервером формат
       const formattedIngredients = formData.ingredients.map((id) => ({ id }));
-  
+
       // Создаем объект данных, который будет отправлен на сервер
       const requestData = {
         name: formData.name,
@@ -177,22 +213,26 @@ const AdminPage = () => {
         kitchen: formData.kitchen ? { id: formData.kitchen.id } : null,
         ingredients: formattedIngredients,
       };
-  
+
       if (editMode) {
         requestData.id = editItemId; // Добавляем ID, если в режиме редактирования
         await updateMenuItem(requestData);
       } else {
         await createMenuItem(requestData); // Создаем новое блюдо
       }
-  
+
       setShowForm(false); // Закрываем форму
       loadMenuItems(); // Обновляем список блюд
     } catch (error) {
       alert(`Ошибка: ${error.response?.data?.message || error.message}`);
     }
   };
-  
-  
+
+  const scrollToForm = () => {
+    if (dishFormRef.current) {
+      dishFormRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="admin-page">
@@ -201,12 +241,12 @@ const AdminPage = () => {
       <div className="admin-content">
         <div>
           <h2>Список блюд</h2>
-          <button onClick={handleAddClick} className="admin-add-dish-button">
+          <button onClick={handleAddClick} className="admin-add-item-button">
             Добавить блюдо
           </button>
-          <ul className="menu-list">
+          <ul className="admin-list">
             {menuItems.map((item) => (
-              <li key={item.id} className="menu-item">
+              <li key={item.id} className="admin-item">
                 <div>
                   {/* Блок кнопок в правом верхнем углу */}
                   <div className="action-buttons">
@@ -217,23 +257,28 @@ const AdminPage = () => {
                   </div>
                   <p>ID: {item.id}</p> {/* Добавлено отображение ID */}
                   <strong>{item.name}</strong>
-                  <p>{item.description}</p>
+                  <p className="admin-form-p-description ">Описание: {item.description}</p>
                   <p>Цена: {item.price} руб.</p>
                   <p>Категория: {item.category}</p>
                   <p>Кухня: {item.kitchen?.name || "Не указано"}</p>
-                  <p>
-                    Доступность:{" "}
-                    {item.availabilityStatus ? "Доступно" : "Не доступно"}
-                  </p>
                   <p>Вес: {item.weight} г</p>
                   <p>Калории: {item.calories} ккал</p>
                   <p>
                     Ингредиенты:{" "}
                     {item.ingredients.map((ing) => ing.name).join(", ")}
                   </p>
+                  {/* Добавление изображения */}
+                  <div className="admin-item-image-container">
+                    <ImageComponent
+                      id={item.id}
+                      dish={item}
+                      className="admin-item-image"
+                    />
+                  </div>
                 </div>
                 {/* Блок загрузки изображения */}
                 <div className="upload-container">
+                  <div className="upload-container-info">
                   <label
                     htmlFor={`upload-${item.id}`}
                     className="choise-image-button"
@@ -249,19 +294,23 @@ const AdminPage = () => {
                   <span className="file-name">
                     {fileNames[item.id] || "Файл не выбран"}
                   </span>
-                  <button onClick={() => handleUploadImage(item.id)}>
+                  <button onClick={() => handleUploadImage(item.id)}
+                    className="upload-image-button">
                     Загрузить картинку
                   </button>
+                  </div>
                 </div>
               </li>
             ))}
           </ul>
 
           {showForm && (
-            <div className="menu-form">
+            <div ref={dishFormRef} className="admin-form">
               <h3>{editMode ? "Редактировать блюдо" : "Добавить блюдо"}</h3>
               <div className="form-group">
-                <label htmlFor="name">Название:</label>
+                <label htmlFor="name" className="admin-form-label">
+                  Название:
+                </label>
                 <input
                   id="name"
                   type="text"
@@ -269,20 +318,26 @@ const AdminPage = () => {
                   value={formData.name}
                   onChange={handleFormChange}
                   placeholder="Введите название блюда"
+                  className="admin-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="description">Описание:</label>
+                <label htmlFor="description" className="admin-form-label">
+                  Описание:
+                </label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleFormChange}
                   placeholder="Введите описание блюда"
+                  className="admin-form-textarea"
                 ></textarea>
               </div>
               <div className="form-group">
-                <label htmlFor="price">Цена (руб.):</label>
+                <label htmlFor="price" className="admin-form-label">
+                  Цена (руб.):
+                </label>
                 <input
                   id="price"
                   type="number"
@@ -290,72 +345,80 @@ const AdminPage = () => {
                   value={formData.price}
                   onChange={handleFormChange}
                   placeholder="Укажите цену блюда"
+                  className="admin-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="category">Категория:</label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleFormChange}
-                >
-                  <option value="">Выберите категорию</option>
-                  {[
-                    "Закуска",
-                    "Салат",
-                    "Суп",
-                    "Горячее",
-                    "Десерт",
-                    "Напиток",
-                  ].map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                <label htmlFor="category" className="admin-form-label">
+                  Категория:
+                </label>
+                <div className="custom-select-container">
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleFormChange}
+                    className="admin-form-select"
+                  >
+                    <option value=""> </option>{" "}
+                    {/* Пустая опция для управления placeholder */}
+                    {[
+                      "Закуска",
+                      "Салат",
+                      "Суп",
+                      "Основное блюдо", // Обновлено с "Горячее" на "Основное блюдо"
+                      "Гарнир", // Новая категория
+                      "Десерт",
+                      "Напиток",
+                    ].map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  {formData.category === "" && (
+                    <span className="placeholder">Выберите категорию</span> // Подсказка для категорий
+                  )}
+                </div>
               </div>
+
               <div className="form-group">
-                <label htmlFor="kitchen">Кухня:</label>
-                <select
-                  id="kitchen"
-                  name="kitchenId"
-                  value={formData.kitchen?.id || ""}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      kitchen: kitchens.find(
-                        (kitchen) => kitchen.id === parseInt(e.target.value)
-                      ),
-                    })
-                  }
-                >
-                  <option value="">Выберите кухню</option>
-                  {kitchens.map((kitchen) => (
-                    <option key={kitchen.id} value={kitchen.id}>
-                      {kitchen.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="availabilityStatus"
-                    checked={formData.availabilityStatus}
+                <label htmlFor="kitchen" className="admin-form-label">
+                  Кухня:
+                </label>
+                <div className="custom-select-container">
+                  <select
+                    id="kitchen"
+                    name="kitchenId"
+                    value={formData.kitchen?.id || ""}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        availabilityStatus: e.target.checked,
+                        kitchen: kitchens.find(
+                          (kitchen) => kitchen.id === parseInt(e.target.value)
+                        ),
                       })
                     }
-                  />
-                  Доступность
-                </label>
+                    className="admin-form-select"
+                  >
+                    <option value=""> </option>{" "}
+                    {/* Пустая опция для управления placeholder */}
+                    {kitchens.map((kitchen) => (
+                      <option key={kitchen.id} value={kitchen.id}>
+                        {kitchen.name}
+                      </option>
+                    ))}
+                  </select>
+                  {formData.kitchen?.id === "" || !formData.kitchen ? (
+                    <span className="placeholder">Выберите кухню</span> // Подсказка для кухни
+                  ) : null}
+                </div>
               </div>
+
               <div className="form-group">
-                <label htmlFor="weight">Вес (граммы):</label>
+                <label htmlFor="weight" className="admin-form-label">
+                  Вес (граммы):
+                </label>
                 <input
                   id="weight"
                   type="number"
@@ -363,10 +426,13 @@ const AdminPage = () => {
                   value={formData.weight}
                   onChange={handleFormChange}
                   placeholder="Укажите вес блюда"
+                  className="admin-form-input"
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="calories">Калории:</label>
+                <label htmlFor="calories" className="admin-form-label">
+                  Калории:
+                </label>
                 <input
                   id="calories"
                   type="number"
@@ -374,6 +440,7 @@ const AdminPage = () => {
                   value={formData.calories}
                   onChange={handleFormChange}
                   placeholder="Укажите калорийность блюда"
+                  className="admin-form-input"
                 />
               </div>
               <div className="form-group checkbox-group">
@@ -391,8 +458,15 @@ const AdminPage = () => {
                 ))}
               </div>
               <div className="form-buttons">
-                <button onClick={handleFormSubmit}>✔️ Сохранить</button>
-                <button onClick={() => setShowForm(false)}>Отмена</button>
+                <button onClick={handleFormSubmit} className="admin-save-button">
+                  ✔️ Сохранить
+                </button>
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="admin-cancel-button"
+                >
+                  Отмена
+                </button>
               </div>
             </div>
           )}

@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getAllOrders,
+  getAllCustomers,
   getAllManagers,
+  getAllCouriers,
   createEmployee,
   updateUser,
   deleteUser,
@@ -18,14 +20,12 @@ const ManagersPage = () => {
     name: "",
     username: "",
     password: "",
-    passwordConfirmation: "",
     phone: "",
     address: "",
     roles: ["ROLE_MANAGER"],
   });
   const [editMode, setEditMode] = useState(false);
   const [editManagerId, setEditManagerId] = useState(null);
-  const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false);
 
   useEffect(() => {
     loadManagers();
@@ -51,7 +51,6 @@ const ManagersPage = () => {
       name: "",
       username: "",
       password: "",
-      passwordConfirmation: "",
       phone: "",
       address: "",
       roles: ["ROLE_MANAGER"],
@@ -64,7 +63,6 @@ const ManagersPage = () => {
     setFormData({
       ...manager,
       password: "",
-      passwordConfirmation: "",
     });
     setEditMode(true);
     setEditManagerId(manager.id);
@@ -72,132 +70,194 @@ const ManagersPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
-      // Получить все заказы
       const orders = await getAllOrders();
-  
-      // Проверить заказы, относящиеся к менеджеру
       const hasActiveOrders = orders.some(
-        (order) =>
-          order.status !== "доставлен" &&
-          order.status !== "отменен"
+        (order) => order.managerId === id && order.status !== "доставлен" && order.status !== "отменен"
       );
-  
+
       if (hasActiveOrders) {
         alert("Невозможно удалить менеджера, так как имеются активные заказы.");
         return;
       }
-  
-      // Удалить менеджера, если нет активных заказов
+
       await deleteUser(id);
       loadManagers();
     } catch (error) {
       console.error("Ошибка удаления менеджера:", error);
     }
   };
-  
 
   const handleFormSubmit = async () => {
     try {
-        if (editMode) {
-          const updatedData = {
-            name: formData.name,
-            username: formData.username,
-            phone: formData.phone,
-            address: formData.address,
-          };
-          console.log("Edit Manager ID:", editManagerId);
-          console.log("Updated Data:", updatedData);
-          await updateUser(editManagerId, updatedData);
-        } else {
-          await createEmployee(formData);
-        }
-    
-        setShowForm(false);
-        loadManagers();
-      } catch (error) {
-        alert(`Ошибка: ${error.response?.data?.message || error.message}`);
+      // Загружаем всех пользователей (клиенты, менеджеры, курьеры)
+      const [customers, managers, couriers] = await Promise.all([
+        getAllCustomers(),
+        getAllManagers(),
+        getAllCouriers(),
+      ]);
+  
+      const allUsers = [...customers, ...managers, ...couriers];
+  
+      // Проверяем уникальность логина
+      const isUsernameTaken = allUsers.some(
+        (user) =>
+          user.username === formData.username &&
+          (!editMode || user.id !== editManagerId) // Исключаем текущего пользователя в режиме редактирования
+      );
+  
+      if (isUsernameTaken) {
+        alert("Этот логин уже занят. Пожалуйста, выберите другой.");
+        return;
       }
+  
+      if (editMode) {
+        // Обновление менеджера
+        const updatedData = {
+          name: formData.name,
+          username: formData.username,
+          phone: formData.phone,
+          address: formData.address,
+        };
+        await updateUser(editManagerId, updatedData);
+      } else {
+        // Добавление нового менеджера
+        const newManagerData = {
+          ...formData,
+          passwordConfirmation: formData.password, // Устанавливаем пароль дважды
+        };
+        await createEmployee(newManagerData);
+      }
+  
+      setShowForm(false);
+      loadManagers();
+    } catch (error) {
+      alert(`Ошибка: ${error.response?.data?.message || error.message}`);
+    }
   };
-
+  
 
   return (
     <div className="admin-page">
-     <NavigationBar></NavigationBar>
-      <h2>Список менеджеров</h2>
-      <button onClick={handleAddClick}>Добавить менеджера</button>
+      <NavigationBar />
+      <div className="admin-content">
+        <div>
+          <h2>Список менеджеров</h2>
+          <button onClick={handleAddClick} className="admin-add-item-button">
+            Добавить менеджера
+          </button>
+          <ul className="admin-list">
+            {managers.map((manager) => (
+              <li key={manager.id} className="admin-item">
+                <div>
+                  <div className="action-buttons">
+                    <button onClick={() => handleEditClick(manager)}>✏️</button>
+                    <button onClick={() => handleDeleteClick(manager.id)}>
+                      ❌
+                    </button>
+                  </div>
+                  <p>ID: {manager.id}</p>
+                  <strong>{manager.name}</strong>
+                  <p>Логин: {manager.username}</p>
+                  <p>Телефон: {manager.phone}</p>
+                  <p>Адрес: {manager.address}</p>
+                  <p>Роли: {manager.roles.join(", ")}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
 
-      <ul className="manager-list">
-        {managers.map((manager) => (
-          <li key={manager.id} className="manager-item">
-            <div>
-              <p>ID: {manager.id}</p>
-              <strong>{manager.name}</strong>
-              <p>Логин: {manager.username}</p>
-              <p>Телефон: {manager.phone}</p>
-              <p>Адрес: {manager.address}</p>
-              <p>Роли: {manager.roles.join(", ")}</p>
+          {showForm && (
+            <div className="admin-form">
+              <h3>{editMode ? "Редактировать менеджера" : "Добавить менеджера"}</h3>
+              <div className="form-group">
+                <label htmlFor="name" className="admin-form-label">
+                  ФИО:
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  className="admin-form-input"
+                  placeholder="Введите ФИО менеджера"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="username" className="admin-form-label">
+                  Логин:
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleFormChange}
+                  className="admin-form-input"
+                  placeholder="Введите логин менеджера"
+                />
+              </div>
+              {!editMode && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="password" className="admin-form-label">
+                      Пароль:
+                    </label>
+                    <input
+                      id="password"
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleFormChange}
+                      className="admin-form-input"
+                      placeholder="Введите пароль менеджера"
+                    />
+                  </div>
+                </>
+              )}
+              <div className="form-group">
+                <label htmlFor="phone" className="admin-form-label">
+                  Телефон:
+                </label>
+                <input
+                  id="phone"
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleFormChange}
+                  className="admin-form-input"
+                  placeholder="Введите телефон менеджера"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="address" className="admin-form-label">
+                  Адрес:
+                </label>
+                <input
+                  id="address"
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleFormChange}
+                  className="admin-form-input"
+                  placeholder="Введите адрес менеджера"
+                />
+              </div>
+              <div className="form-buttons">
+                <button onClick={handleFormSubmit} className="admin-save-button">
+                  ✔️ Сохранить
+                </button>
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="admin-cancel-button"
+                >
+                  Отмена
+                </button>
+              </div>
             </div>
-            <div>
-              <button onClick={() => handleEditClick(manager)}>✏️</button>
-              <button onClick={() => handleDeleteClick(manager.id)}>❌</button>
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {showForm && (
-        <div className="manager-form">
-          <h3>{editMode ? "Редактировать менеджера" : "Добавить менеджера"}</h3>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleFormChange}
-            placeholder="Имя"
-          />
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleFormChange}
-            placeholder="Логин"
-          />
-          {!editMode && (
-            <>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleFormChange}
-                placeholder="Пароль"
-              />
-              <input
-                type="password"
-                name="passwordConfirmation"
-                value={formData.passwordConfirmation}
-                onChange={handleFormChange}
-                placeholder="Подтверждение пароля"
-              />
-            </>
           )}
-          <input
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleFormChange}
-            placeholder="Телефон"
-          />
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleFormChange}
-            placeholder="Адрес"
-          />
-          <button onClick={handleFormSubmit}>✔️</button>
-          <button onClick={() => setShowForm(false)}>Отмена</button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -13,12 +13,12 @@
   padding-top: 10px;
 }
 
-.admin-page .admin-content>div>h2 {
+.admin-page .admin-content > div > h2 {
   margin-top: 0px;
 }
 
 /* Стили для карточек */
-.admin-page .menu-list {
+.admin-page .admin-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 карточки в строке */
   gap: 20px; /* Расстояние между карточками */
@@ -26,7 +26,7 @@
   margin: 20px 0;
 }
 
-.admin-page .menu-item {
+.admin-page .admin-item {
   background-color: #ffffff;
   border: 1px solid #e1e4e8;
   border-radius: 8px;
@@ -39,16 +39,29 @@
   position: relative; /* Устанавливаем относительное позиционирование */
 }
 
-.admin-page .menu-item:hover {
+.admin-item-info {
+  flex: 1;
+  padding-right: 20px; /* Space between info and image */
+}
+
+.admin-item-image {
+  max-width: 150px; /* Set a fixed width for the image */
+  border-radius: 8px; /* Optional: Adds rounded corners */
+  position: absolute; /* Фиксируем картинку */
+  top: 50px;
+  right: 20px;
+}
+
+.admin-page .admin-item:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   transform: scale(1.02);
 }
 
-.admin-page .menu-item div {
+.admin-page .admin-item div {
   flex: 1;
 }
 
-.admin-page .menu-item .action-buttons {
+.admin-page .admin-item .action-buttons {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -56,7 +69,7 @@
   gap: 10px;
 }
 
-.admin-page .menu-item .action-buttons button {
+.admin-page .admin-item .action-buttons button {
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -65,43 +78,42 @@
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
-.admin-page .menu-item .action-buttons button:hover {
+.admin-page .admin-item .action-buttons button:hover {
   color: #2c3e50;
   transform: scale(1.1);
 }
 
-
-.admin-page .menu-item p {
+.admin-page .admin-item p {
   margin: 5px 0;
   font-size: 15px;
   color: #555;
   line-height: 1.5;
 }
 
-.admin-page .menu-item strong {
+.admin-page .admin-item strong {
   font-size: 18px;
   color: #2c3e50;
 }
 
-.admin-page .menu-item button:hover {
+.admin-page .admin-item button:hover {
   color: #2c3e50;
   transform: scale(1.1);
 }
 
 /* Стили для кнопки загрузки изображения */
-.admin-page .menu-item .upload-container {
+.admin-page .admin-item .upload-container {
   display: flex;
-  align-items: center;
+  align-items: end;
   margin-top: 15px;
   justify-content: space-between;
   text-align: center;
 }
 
-.admin-page .menu-item .upload-container input[type="file"] {
+.admin-page .admin-item .upload-container input[type="file"] {
   display: none; /* Скрываем стандартное поле */
 }
 
-.admin-page .menu-item .upload-container .choise-image-button {
+.choise-image-button {
   background-color: #3498db;
   color: #fff;
   padding: 10px 5px;
@@ -110,14 +122,15 @@
   cursor: pointer;
   transition: color 0.3s ease, transform 0.2s ease;
   text-align: center;
+  border: none;
 }
 
-.admin-page .menu-item .upload-container .choise-image-button:hover {
+.choise-image-button:hover {
   background-color: #2980b9;
   transform: scale(1.05);
 }
 
-.admin-page .menu-item .upload-container button {
+.upload-image-button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -128,21 +141,20 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.admin-page .menu-item .upload-container button:hover {
+.upload-image-button:hover {
   background-color: #45a049;
   transform: scale(1.05);
 }
 
-
-.admin-page .menu-item .upload-container .file-name {
+.admin-page .admin-item .upload-container .file-name {
   font-size: 14px;
   color: #555;
   font-style: italic;
+  margin-inline: 10px;
 }
 
-
 /* Форма добавления/редактирования */
-.admin-page .menu-form {
+.admin-page .admin-form {
   background-color: #ffffff;
   border: 1px solid #e1e4e8;
   border-radius: 8px;
@@ -151,31 +163,43 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   margin-left: auto;
   margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 1300px;
 }
 
-.admin-page .menu-form h3 {
+.admin-page .admin-form h3 {
   margin-top: 0;
   font-size: 24px;
   color: #2c3e50;
   text-align: center;
 }
 
-.menu-form .form-group {
+.admin-form .form-group {
   margin-bottom: 5px;
+  width: 85%;
 }
 
-.menu-form label {
+.admin-form-label {
   font-size: 16px;
-  color: #555;
   margin-bottom: 8px;
   display: block;
+  color: #000;
 }
 
-.menu-form input,
-.menu-form select,
-.menu-form textarea {
-  width: 100%;
-  padding: 12px;
+.admin-form-p-description {
+  max-width: 285px;
+}
+
+.admin-form-input,
+.admin-form-select,
+.admin-form-textarea {
+  width: 100%; /* Устанавливаем одинаковую ширину */
+  max-width: 1200px; /* Опционально, чтобы ограничить максимальную ширину */
+  padding: 10px; /* Устанавливаем одинаковый отступ внутри полей */
+  box-sizing: border-box; /* Гарантируем, что padding и border включены в ширину */
   margin-bottom: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -183,33 +207,33 @@
   background-color: #f9f9f9;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   resize: none; /* Отключение изменения размера textarea */
+  color: #000;
 }
 
-.menu-form input:focus,
-.menu-form select:focus,
-.menu-form textarea:focus {
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 
-.menu-form textarea {
+.admin-form textarea {
   font-family: Arial, sans-serif; /* Совместимый шрифт для всех полей */
 }
 
-.menu-form input[type="file"] {
+.admin-form input[type="file"] {
   padding: 0;
+  width: auto; /* Исключение для файлового ввода */
 }
 
-.menu-form .form-buttons {
+.admin-form .form-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.menu-form button {
-  background-color: #4CAF50;
-  color: white;
+.admin-form button {
   border: none;
   padding: 12px 20px;
   border-radius: 8px;
@@ -218,43 +242,57 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.menu-form button:hover {
-  background-color: #45a049;
+.admin-save-button {
+  background-color: #00ff088c;
+  color: white;
+  margin-right: 30px;
+}
+
+.admin-cancel-button {
+  background-color: #ff030398;
+}
+
+.admin-save-button:hover {
+  background-color: #00ff0db5;
   transform: translateY(-2px);
 }
 
-.menu-form .checkbox-group h4 {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #2c3e50; 
+.admin-cancel-button:hover {
+  background-color: #ff0303d1;
+  transform: translateY(-2px);
 }
 
-.menu-form .checkbox-group {
+.admin-form .checkbox-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: wrap; /* Позволяет перенести элементы на новую строку, если они не помещаются */
+  align-items: center; /* Центрируем все элементы по вертикали */
 }
 
-.menu-form .checkbox-group label {
-  font-size: 14px;
-  color: #555;
+.admin-form .checkbox-group label {
   display: flex;
-  align-items: center;
-  margin-right: 10px;
+  align-items: center; /* Вертикальное выравнивание элементов внутри label */
+  font-size: 16px; /* Размер шрифта */
+  margin-right: 15px; /* Отступ между элементами */
 }
 
-.menu-form .checkbox-group input {
-  margin-right: 5px;
+.admin-form .checkbox-group input[type="checkbox"] {
+  margin-right: 5px; /* Отступ между чекбоксом и текстом */
 }
 
+.admin-form .checkbox-group h4 {
+  font-size: 18px; /* Размер шрифта для заголовка */
+  font-weight: bold;
+  align-self: center; /* Центрируем заголовок по вертикали */
+  margin-right: 15px;
+}
 
 /* Кнопки в заголовке */
 .admin-page button:hover {
   cursor: pointer;
 }
 
-/* Кнопка добавления блюда */
-.admin-add-dish-button {
+/* Кнопка добавления элемента */
+.admin-add-item-button {
   background-color: #4CAF50;
   color: white;
   border: none;
@@ -265,7 +303,7 @@
   margin-left: 20px;
 }
 
-.admin-add-dish-button:hover {
+.admin-add-item-button:hover {
   background-color: #45a049;
 }
 
@@ -275,8 +313,7 @@
   margin-top: 20px;
 }
 
-.kitchen-directory,
-.dish-types-directory {
+.admin-directory {
   flex: 1;
   margin: 0 10px;
   padding: 10px;
@@ -300,4 +337,30 @@
 
 .admin-page .directory-item p {
   margin: 5px 0;
+}
+
+.custom-select-container {
+  position: relative;
+}
+
+.custom-select-container select {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  padding-left: 10px;
+}
+
+/* Стили для placeholder */
+.form-group .placeholder {
+  position: absolute;
+  top: 35%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #888;
+  pointer-events: none; /* Позволяет работать с select поверх подсказки */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
