@@ -36,6 +36,13 @@ const ValidationHelper = {
       }
       return null;
     },
+    
+    validatePassword(password) {
+      if (!password || password.length < 8 || password.length > 16) {
+        return "Пароль должен содержать от 8 до 16 символов.";
+      }
+      return null;
+    },
   };
   
   export default ValidationHelper;

@@ -11,6 +11,7 @@ import {
 } from "../../http/adminService";
 import "./Admin.css";
 import NavigationBar from "../../components/NavigationBar";
+import ValidationHelper from "../../components/ValidationHelper";
 
 const CouriersPage = () => {
   const navigate = useNavigate();
@@ -21,13 +22,13 @@ const CouriersPage = () => {
     name: "",
     username: "",
     password: "",
-    passwordConfirmation: "",
     phone: "",
     address: "",
     roles: ["ROLE_COURIER"],
   });
   const [editMode, setEditMode] = useState(false);
   const [editCourierId, setEditCourierId] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     loadCouriers();
@@ -47,6 +48,28 @@ const CouriersPage = () => {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Update errors in real-time as user types
+    const errors = { ...formErrors };
+    switch (name) {
+      case "name":
+        errors.name = ValidationHelper.validateName(value);
+        break;
+      case "username":
+        errors.username = ValidationHelper.validateEmail(value);
+        break;
+      case "password":
+        if (!editMode) {
+          errors.password = ValidationHelper.validatePassword(value);
+        }
+        break;
+      case "phone":
+        errors.phone = ValidationHelper.validatePhone(value);
+        break;
+      default:
+        break;
+    }
+    setFormErrors(errors);
   };
 
   const handleAddClick = () => {
@@ -55,12 +78,12 @@ const CouriersPage = () => {
       name: "",
       username: "",
       password: "",
-      passwordConfirmation: "",
       phone: "",
       address: "",
       roles: ["ROLE_COURIER"],
     });
     setEditMode(false);
+    setFormErrors({});
   };
 
   const handleEditClick = (courier) => {
@@ -68,10 +91,10 @@ const CouriersPage = () => {
     setFormData({
       ...courier,
       password: "",
-      passwordConfirmation: "",
     });
     setEditMode(true);
     setEditCourierId(courier.id);
+    setFormErrors({});
   };
 
   const handleDeleteClick = async (id) => {
@@ -95,14 +118,33 @@ const CouriersPage = () => {
 
   const handleFormSubmit = async () => {
     try {
-      // Загружаем всех пользователей (клиенты, менеджеры, курьеры)
+      // Validate form data before submitting
+      const errors = {
+        name: ValidationHelper.validateName(formData.name),
+        username: ValidationHelper.validateEmail(formData.username),
+        phone: ValidationHelper.validatePhone(formData.phone),
+      };
+
+      if (!editMode) {
+        errors.password = ValidationHelper.validatePassword(formData.password);
+      }
+
+      const filteredErrors = Object.fromEntries(
+        Object.entries(errors).filter(([, value]) => value)
+      );
+
+      if (Object.keys(filteredErrors).length > 0) {
+        setFormErrors(filteredErrors);
+        return;
+      }
+
       const [customers, managers, couriers] = await Promise.all([
         getAllCustomers(),
         getAllManagers(),
         getAllCouriers(),
       ]);
-  
       const allUsers = [...customers, ...managers, ...couriers];
+
       const isUsernameTaken = allUsers.some(
         (user) =>
           user.username === formData.username &&
@@ -125,7 +167,7 @@ const CouriersPage = () => {
       } else {
         const newCourierData = {
           ...formData,
-          passwordConfirmation: formData.password, // Устанавливаем пароль дважды
+          passwordConfirmation: formData.password,
         };
         await createEmployee(newCourierData);
       }
@@ -196,6 +238,7 @@ const CouriersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите ФИО курьера"
                 />
+                {formErrors.name && <span className="error-message">{formErrors.name}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="username" className="admin-form-label">
@@ -210,24 +253,26 @@ const CouriersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите логин курьера"
                 />
+                {formErrors.username && <span className="error-message">{formErrors.username}</span>}
               </div>
               {!editMode && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="password" className="admin-form-label">
-                      Пароль:
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleFormChange}
-                      className="admin-form-input"
-                      placeholder="Введите пароль курьера"
-                    />
-                  </div>
-                </>
+                <div className="form-group">
+                  <label htmlFor="password" className="admin-form-label">
+                    Пароль:
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleFormChange}
+                    className="admin-form-input"
+                    placeholder="Введите пароль курьера"
+                  />
+                  {formErrors.password && (
+                    <span className="error-message">{formErrors.password}</span>
+                  )}
+                </div>
               )}
               <div className="form-group">
                 <label htmlFor="phone" className="admin-form-label">
@@ -242,6 +287,7 @@ const CouriersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите телефон курьера"
                 />
+                {formErrors.phone && <span className="error-message">{formErrors.phone}</span>}
               </div>
               <div className="form-group">
                 <label htmlFor="address" className="admin-form-label">
@@ -258,16 +304,10 @@ const CouriersPage = () => {
                 />
               </div>
               <div className="form-buttons">
-                <button
-                  onClick={handleFormSubmit}
-                  className="admin-save-button"
-                >
+                <button onClick={handleFormSubmit} className="admin-save-button">
                   ✔️ Сохранить
                 </button>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="admin-cancel-button"
-                >
+                <button onClick={() => setShowForm(false)} className="admin-cancel-button">
                   Отмена
                 </button>
               </div>

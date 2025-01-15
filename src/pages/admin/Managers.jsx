@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  getAllOrders,
-  getAllCustomers,
   getAllManagers,
+  getAllCustomers,
   getAllCouriers,
   createEmployee,
   updateUser,
@@ -11,6 +10,7 @@ import {
 } from "../../http/adminService";
 import "./Admin.css";
 import NavigationBar from "../../components/NavigationBar";
+import ValidationHelper from "../../components/ValidationHelper";
 
 const ManagersPage = () => {
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ const ManagersPage = () => {
     username: "",
     password: "",
     phone: "",
-    address: "",
     roles: ["ROLE_MANAGER"],
   });
   const [editMode, setEditMode] = useState(false);
@@ -36,7 +35,7 @@ const ManagersPage = () => {
       const data = await getAllManagers();
       setManagers(data);
     } catch (error) {
-      console.error("Ошибка загрузки менеджеров:", error);
+      console.error("Error loading managers:", error);
     }
   };
 
@@ -52,7 +51,6 @@ const ManagersPage = () => {
       username: "",
       password: "",
       phone: "",
-      address: "",
       roles: ["ROLE_MANAGER"],
     });
     setEditMode(false);
@@ -70,39 +68,50 @@ const ManagersPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
-      const orders = await getAllOrders();
-      const hasActiveOrders = orders.some(
-        (order) => order.managerId === id && order.status !== "доставлен" && order.status !== "отменен"
-      );
-
-      if (hasActiveOrders) {
-        alert("Невозможно удалить менеджера, так как имеются активные заказы.");
-        return;
-      }
-
       await deleteUser(id);
       loadManagers();
     } catch (error) {
-      console.error("Ошибка удаления менеджера:", error);
+      console.error("Error deleting manager:", error);
     }
   };
 
   const handleFormSubmit = async () => {
     try {
-      // Загружаем всех пользователей (клиенты, менеджеры, курьеры)
+      console.log('Submitting form data:', formData);
+      const errors = {};
+  
+      // Валидация полей
+      const nameError = ValidationHelper.validateName(formData.name);
+      if (nameError) errors.name = nameError;
+  
+      const phoneError = ValidationHelper.validatePhone(formData.phone);
+      if (phoneError) errors.phone = phoneError;
+  
+      const emailError = ValidationHelper.validateEmail(formData.username);
+      if (emailError) errors.username = emailError;
+  
+      if (!editMode) {
+        const passwordError = ValidationHelper.validatePassword(formData.password);
+        if (passwordError) errors.password = passwordError;
+      }
+  
+      if (Object.keys(errors).length > 0) {
+        alert(Object.values(errors).join("\n"));
+        return;
+      }
+  
+      console.log('Validation passed. Checking username uniqueness...');
       const [customers, managers, couriers] = await Promise.all([
         getAllCustomers(),
         getAllManagers(),
         getAllCouriers(),
       ]);
-  
       const allUsers = [...customers, ...managers, ...couriers];
   
-      // Проверяем уникальность логина
       const isUsernameTaken = allUsers.some(
         (user) =>
           user.username === formData.username &&
-          (!editMode || user.id !== editManagerId) // Исключаем текущего пользователя в режиме редактирования
+          (!editMode || user.id !== editManagerId)
       );
   
       if (isUsernameTaken) {
@@ -110,27 +119,28 @@ const ManagersPage = () => {
         return;
       }
   
+      console.log(editMode ? 'Updating manager...' : 'Creating new manager...');
       if (editMode) {
-        // Обновление менеджера
         const updatedData = {
           name: formData.name,
           username: formData.username,
           phone: formData.phone,
-          address: formData.address,
         };
         await updateUser(editManagerId, updatedData);
       } else {
-        // Добавление нового менеджера
         const newManagerData = {
           ...formData,
-          passwordConfirmation: formData.password, // Устанавливаем пароль дважды
+          passwordConfirmation: formData.password,
+          roles: ["ROLE_MANAGER"],
         };
         await createEmployee(newManagerData);
       }
   
+      alert('Успешно сохранено!');
       setShowForm(false);
       loadManagers();
     } catch (error) {
+      console.error('Error submitting form:', error.response || error);
       alert(`Ошибка: ${error.response?.data?.message || error.message}`);
     }
   };
@@ -159,7 +169,6 @@ const ManagersPage = () => {
                   <strong>{manager.name}</strong>
                   <p>Логин: {manager.username}</p>
                   <p>Телефон: {manager.phone}</p>
-                  <p>Адрес: {manager.address}</p>
                   <p>Роли: {manager.roles.join(", ")}</p>
                 </div>
               </li>
@@ -182,6 +191,11 @@ const ManagersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите ФИО менеджера"
                 />
+                {formData.name.length > 0 && ValidationHelper.validateName(formData.name) && (
+                  <span className="error-message">
+                    {ValidationHelper.validateName(formData.name)}
+                  </span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="username" className="admin-form-label">
@@ -196,24 +210,32 @@ const ManagersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите логин менеджера"
                 />
+                {formData.username.length > 0 && ValidationHelper.validateEmail(formData.username) && (
+                  <span className="error-message">
+                    {ValidationHelper.validateEmail(formData.username)}
+                  </span>
+                )}
               </div>
               {!editMode && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="password" className="admin-form-label">
-                      Пароль:
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleFormChange}
-                      className="admin-form-input"
-                      placeholder="Введите пароль менеджера"
-                    />
-                  </div>
-                </>
+                <div className="form-group">
+                  <label htmlFor="password" className="admin-form-label">
+                    Пароль:
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleFormChange}
+                    className="admin-form-input"
+                    placeholder="Введите пароль менеджера"
+                  />
+                  {formData.password.length > 0 && ValidationHelper.validatePassword(formData.password) && (
+                    <span className="error-message">
+                      {ValidationHelper.validatePassword(formData.password)}
+                    </span>
+                  )}
+                </div>
               )}
               <div className="form-group">
                 <label htmlFor="phone" className="admin-form-label">
@@ -228,20 +250,11 @@ const ManagersPage = () => {
                   className="admin-form-input"
                   placeholder="Введите телефон менеджера"
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="address" className="admin-form-label">
-                  Адрес:
-                </label>
-                <input
-                  id="address"
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleFormChange}
-                  className="admin-form-input"
-                  placeholder="Введите адрес менеджера"
-                />
+                {formData.phone.length > 0 && ValidationHelper.validatePhone(formData.phone) && (
+                  <span className="error-message">
+                    {ValidationHelper.validatePhone(formData.phone)}
+                  </span>
+                )}
               </div>
               <div className="form-buttons">
                 <button onClick={handleFormSubmit} className="admin-save-button">

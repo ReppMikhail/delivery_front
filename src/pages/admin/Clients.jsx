@@ -11,6 +11,7 @@ import {
 } from "../../http/adminService";
 import "./Admin.css";
 import NavigationBar from "../../components/NavigationBar";
+import ValidationHelper from "../../components/ValidationHelper";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -95,29 +96,52 @@ const ClientsPage = () => {
 
   const handleFormSubmit = async () => {
     try {
-      // Загружаем всех пользователей (клиенты, менеджеры, курьеры)
+      const errors = {};
+
+      // Проверка полей через валидатор
+      const nameError = ValidationHelper.validateName(formData.name);
+      if (nameError) errors.name = nameError;
+
+      const phoneError = ValidationHelper.validatePhone(formData.phone);
+      if (phoneError) errors.phone = phoneError;
+
+      const emailError = ValidationHelper.validateEmail(formData.username);
+      if (emailError) errors.username = emailError;
+
+      const addressError = ValidationHelper.validateAddress(formData.address);
+      if (addressError) errors.address = addressError;
+
+      if (!editMode) {
+        const passwordError = ValidationHelper.validatePassword(formData.password);
+        if (passwordError) errors.password = passwordError;
+      }
+
+      if (Object.keys(errors).length > 0) {
+        alert(Object.values(errors).join("\n"));
+        return;
+      }
+
+      // Проверяем уникальность логина
       const [customers, managers, couriers] = await Promise.all([
         getAllCustomers(),
         getAllManagers(),
         getAllCouriers(),
       ]);
-  
+
       const allUsers = [...customers, ...managers, ...couriers];
-  
-      // Проверяем уникальность логина
+
       const isUsernameTaken = allUsers.some(
         (user) =>
           user.username === formData.username &&
-          (!editMode || user.id !== editClientId) // Исключаем текущего пользователя в режиме редактирования
+          (!editMode || user.id !== editClientId)
       );
-  
+
       if (isUsernameTaken) {
         alert("Этот логин уже занят. Пожалуйста, выберите другой.");
         return;
       }
-  
+
       if (editMode) {
-        // Обновление клиента
         const updatedData = {
           name: formData.name,
           username: formData.username,
@@ -126,21 +150,19 @@ const ClientsPage = () => {
         };
         await updateUser(editClientId, updatedData);
       } else {
-        // Добавление нового клиента
         const newClientData = {
           ...formData,
-          passwordConfirmation: formData.password, // Устанавливаем пароль дважды
+          passwordConfirmation: formData.password,
         };
         await createCustomer(newClientData);
       }
-  
+
       setShowForm(false);
       loadClients();
     } catch (error) {
-      alert(`Error: ${error.response?.data?.message || error.message}`);
+      alert(`Ошибка: ${error.response?.data?.message || error.message}`);
     }
   };
-  
 
   return (
     <div className="admin-page">
@@ -188,6 +210,11 @@ const ClientsPage = () => {
                   className="admin-form-input"
                   placeholder="Введите ФИО клиента"
                 />
+                {formData.name.length > 0 && ValidationHelper.validateName(formData.name) && (
+                  <span className="error-message">
+                    {ValidationHelper.validateName(formData.name)}
+                  </span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="username" className="admin-form-label">
@@ -202,24 +229,32 @@ const ClientsPage = () => {
                   className="admin-form-input"
                   placeholder="Введите логин клиента"
                 />
+                {formData.username.length > 0 && ValidationHelper.validateEmail(formData.username) && (
+                  <span className="error-message">
+                    {ValidationHelper.validateEmail(formData.username)}
+                  </span>
+                )}
               </div>
               {!editMode && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="password" className="admin-form-label">
-                      Пароль:
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleFormChange}
-                      className="admin-form-input"
-                      placeholder="Введите пароль клиента"
-                    />
-                  </div>
-                </>
+                <div className="form-group">
+                  <label htmlFor="password" className="admin-form-label">
+                    Пароль:
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleFormChange}
+                    className="admin-form-input"
+                    placeholder="Введите пароль клиента"
+                  />
+                  {formData.password.length > 0 && ValidationHelper.validatePassword(formData.password) && (
+                    <span className="error-message">
+                      {ValidationHelper.validatePassword(formData.password)}
+                    </span>
+                  )}
+                </div>
               )}
               <div className="form-group">
                 <label htmlFor="phone" className="admin-form-label">
@@ -234,6 +269,11 @@ const ClientsPage = () => {
                   className="admin-form-input"
                   placeholder="Введите телефон клиента"
                 />
+                {formData.phone.length > 0 && ValidationHelper.validatePhone(formData.phone) && (
+                  <span className="error-message">
+                    {ValidationHelper.validatePhone(formData.phone)}
+                  </span>
+                )}
               </div>
               <div className="form-group">
                 <label htmlFor="address" className="admin-form-label">
@@ -248,6 +288,11 @@ const ClientsPage = () => {
                   className="admin-form-input"
                   placeholder="Введите адрес клиента"
                 />
+                {formData.address.length > 0 && ValidationHelper.validateAddress(formData.address) && (
+                  <span className="error-message">
+                    {ValidationHelper.validateAddress(formData.address)}
+                  </span>
+                )}
               </div>
               <div className="form-buttons">
                 <button onClick={handleFormSubmit} className="admin-save-button">

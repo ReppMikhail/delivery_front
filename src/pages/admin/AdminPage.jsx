@@ -36,6 +36,7 @@ const AdminPage = () => {
   const [aboutDropdownVisible, setAboutDropdownVisible] = useState(false); // Состояние для выпадающего списка "О нас"
   const [fileNames, setFileNames] = useState({});
   const dishFormRef = useRef(null);
+  const [errors, setErrors] = useState({}); // Состояние для ошибок
 
   // Загрузка данных
   useEffect(() => {
@@ -56,6 +57,35 @@ const AdminPage = () => {
       console.error("Ошибка загрузки блюд:", error);
     }
   };
+
+  const validateForm = () => {
+    const validationErrors = {};
+  
+    // Проверка всех полей
+    if (!formData.name) validationErrors.name = "Название обязательно.";
+    if (!formData.description) validationErrors.description = "Описание обязательно.";
+    if (!formData.price || isNaN(formData.price)) {
+      validationErrors.price = "Введите корректную цену.";
+    } else if (formData.price <= 0) {
+      validationErrors.price = "Цена должна быть больше 0.";
+    }
+    if (!formData.category) validationErrors.category = "Категория обязательна.";
+    if (!formData.weight || isNaN(formData.weight)) {
+      validationErrors.weight = "Введите корректный вес.";
+    } else if (formData.weight <= 0) {
+      validationErrors.weight = "Вес должен быть больше 0.";
+    }
+    if (!formData.calories || isNaN(formData.calories)) {
+      validationErrors.calories = "Введите корректное количество калорий.";
+    } else if (formData.calories <= 0) {
+      validationErrors.calories = "Калории должны быть больше 0.";
+    }
+    if (formData.ingredients.length === 0) validationErrors.ingredients = "Выберите хотя бы один ингредиент.";
+  
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+  
 
   const loadIngredients = async () => {
     try {
@@ -88,6 +118,10 @@ const AdminPage = () => {
       setFormData({ ...formData, ingredients: updatedIngredients });
     } else {
       setFormData({ ...formData, [name]: value });
+    }
+    // Удаляем ошибку при изменении поля
+    if (errors[name]) {
+      setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
     }
   };
 
@@ -182,51 +216,36 @@ const AdminPage = () => {
   };
 
   const handleFormSubmit = async () => {
-    const nameExists = await checkIfNameExists(formData.name);
-
-    if (
-      nameExists &&
-      (!editMode ||
-        (editMode &&
-          formData.name !==
-            menuItems.find((item) => item.id === editItemId).name))
-    ) {
-      alert(
-        "Блюдо с таким названием уже существует. Пожалуйста, выберите другое название."
-      );
-      return; // Прерываем выполнение, если название уже существует
-    }
+    if (!validateForm()) return; // Если валидация не прошла, выходим
 
     try {
-      // Форматируем ингредиенты в ожидаемый сервером формат
       const formattedIngredients = formData.ingredients.map((id) => ({ id }));
-
-      // Создаем объект данных, который будет отправлен на сервер
       const requestData = {
         name: formData.name,
         description: formData.description,
-        price: parseInt(formData.price), // Убедитесь, что цена отправляется как число
+        price: parseInt(formData.price),
         category: formData.category,
-        availabilityStatus: formData.availabilityStatus.toString(), // Приводим к строке "true" или "false"
-        weight: parseInt(formData.weight), // Убедитесь, что вес отправляется как число
-        calories: parseInt(formData.calories), // Убедитесь, что калории отправляются как число
+        availabilityStatus: formData.availabilityStatus.toString(),
+        weight: parseInt(formData.weight),
+        calories: parseInt(formData.calories),
         kitchen: formData.kitchen ? { id: formData.kitchen.id } : null,
         ingredients: formattedIngredients,
       };
 
       if (editMode) {
-        requestData.id = editItemId; // Добавляем ID, если в режиме редактирования
+        requestData.id = editItemId;
         await updateMenuItem(requestData);
       } else {
-        await createMenuItem(requestData); // Создаем новое блюдо
+        await createMenuItem(requestData);
       }
 
-      setShowForm(false); // Закрываем форму
-      loadMenuItems(); // Обновляем список блюд
+      setShowForm(false);
+      loadMenuItems();
     } catch (error) {
       alert(`Ошибка: ${error.response?.data?.message || error.message}`);
     }
   };
+  
 
   const scrollToForm = () => {
     if (dishFormRef.current) {
@@ -320,6 +339,7 @@ const AdminPage = () => {
                   placeholder="Введите название блюда"
                   className="admin-form-input"
                 />
+                {errors.name && <p className="error-text">{errors.name}</p>}
               </div>
               <div className="form-group">
                 <label htmlFor="description" className="admin-form-label">
@@ -333,6 +353,7 @@ const AdminPage = () => {
                   placeholder="Введите описание блюда"
                   className="admin-form-textarea"
                 ></textarea>
+                {errors.description && <p className="error-text">{errors.description}</p>}
               </div>
               <div className="form-group">
                 <label htmlFor="price" className="admin-form-label">
@@ -347,6 +368,7 @@ const AdminPage = () => {
                   placeholder="Укажите цену блюда"
                   className="admin-form-input"
                 />
+                {errors.price && <p className="error-text">{errors.price}</p>}
               </div>
               <div className="form-group">
                 <label htmlFor="category" className="admin-form-label">
@@ -376,6 +398,7 @@ const AdminPage = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.category && <p className="error-text">{errors.category}</p>}
                   {formData.category === "" && (
                     <span className="placeholder">Выберите категорию</span> // Подсказка для категорий
                   )}
@@ -409,6 +432,7 @@ const AdminPage = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.kitchen && <p className="error-text">{errors.kitchen}</p>}
                   {formData.kitchen?.id === "" || !formData.kitchen ? (
                     <span className="placeholder">Выберите кухню</span> // Подсказка для кухни
                   ) : null}
@@ -428,6 +452,7 @@ const AdminPage = () => {
                   placeholder="Укажите вес блюда"
                   className="admin-form-input"
                 />
+                {errors.weight && <p className="error-text">{errors.weight}</p>}
               </div>
               <div className="form-group">
                 <label htmlFor="calories" className="admin-form-label">
@@ -442,6 +467,7 @@ const AdminPage = () => {
                   placeholder="Укажите калорийность блюда"
                   className="admin-form-input"
                 />
+                {errors.calories && <p className="error-text">{errors.calories}</p>}
               </div>
               <div className="form-group checkbox-group">
                 <h4>Ингредиенты:</h4>
@@ -456,6 +482,7 @@ const AdminPage = () => {
                     {ingredient.name}
                   </label>
                 ))}
+                                                      {errors.ingredients && <p className="error-text">{errors.ingredients}</p>}
               </div>
               <div className="form-buttons">
                 <button onClick={handleFormSubmit} className="admin-save-button">

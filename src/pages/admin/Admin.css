@@ -374,3 +374,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.error-text {
+  color: red;
+  font-size: 0.9em;
+}

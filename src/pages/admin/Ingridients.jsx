@@ -43,12 +43,46 @@ const IngredientsPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
+      // Укажите accessToken
+      const authData = JSON.parse(localStorage.getItem("authData"));
+  
+      // Загружаем активные блюда
+      const activeMenuItems = await fetch("http://localhost:8080/api/v1/menuitems", {
+        headers: {
+          Authorization: `Bearer ${authData.accessToken}`,
+        },
+      }).then((res) => res.json());
+  
+      // Загружаем архивные блюда
+      const archivedMenuItems = await fetch("http://localhost:8080/api/v1/menuitems/archive", {
+        headers: {
+          Authorization: `Bearer ${authData.accessToken}`,
+        },
+      }).then((res) => res.json());
+  
+      // Проверяем, используется ли ингредиент
+      const isUsedInActiveMenu = activeMenuItems.some((item) =>
+        item.ingredients.some((ingredient) => ingredient.id === id)
+      );
+      const isUsedInArchivedMenu = archivedMenuItems.some((item) =>
+        item.ingredients.some((ingredient) => ingredient.id === id)
+      );
+  
+      if (isUsedInActiveMenu || isUsedInArchivedMenu) {
+        alert("Этот ингредиент используется в блюдах и не может быть удален.");
+        return;
+      }
+  
+      // Если ингредиент нигде не используется, удаляем его
       await deleteIngredient(id);
       loadIngredients();
     } catch (error) {
       console.error("Ошибка удаления ингредиента:", error);
     }
   };
+  
+  
+  
 
   const handleFormSubmit = async () => {
     try {
