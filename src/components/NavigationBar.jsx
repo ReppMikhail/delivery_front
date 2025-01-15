@@ -109,7 +109,7 @@ const NavigationBar = ({
               <span className="manager-slider round"></span>
             </label>
             <span className="manager-toggle-label">
-              Показать только активные
+              Показать только активные заказы
             </span>
           </div>
           <button

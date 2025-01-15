@@ -13,7 +13,6 @@ import { useCart } from "../context/CartContext";
 import ValidationHelper from "../components/ValidationHelper"; // Импорт валидации
 import NavigationBar from "../components/NavigationBar";
 
-
 const Profile = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState([]);
@@ -37,23 +36,56 @@ const Profile = () => {
     setIsAnyFieldChanged(changedFields.length > 1);
   };
 
-  const handleRepeatOrder = (order) => {
-    // Преобразуем элементы заказа в формат для корзины
-    const newCartItems = order.orderItems.map((item) => ({
-      id: item.menuItem.id,
-      name: item.menuItem.name,
-      price: item.priceAtOrderTime,
-      weight: item.menuItem.weight,
-      quantity: item.quantity, // Устанавливаем точное количество из заказа
-    }));
+  const handleRepeatOrder = async (order) => {
+    try {
+      // Запрашиваем список архивных блюд
+      const authData = JSON.parse(localStorage.getItem("authData"));
+      const response = await axios.get(
+        "http://localhost:8080/api/v1/menuitems/archive",
+        {
+          headers: {
+            Authorization: `Bearer ${authData.accessToken}`,
+          },
+        }
+      );
+      const archivedItems = response.data;
   
-    // Устанавливаем новые элементы в корзину
-    setCartItemsDirectly(newCartItems);
+      // Проверяем, содержит ли заказ архивные блюда
+      const unavailableItems = order.orderItems.filter((item) =>
+        archivedItems.some((archived) => archived.id === item.menuItem.id)
+      );
   
-    // Перенаправление пользователя на страницу корзины
-    navigate("/cart");
+      if (unavailableItems.length > 0) {
+        // Формируем сообщение с перечнем недоступных блюд
+        const itemNames = unavailableItems
+          .map((item) => item.menuItem.name)
+          .join(", ");
+        alert(
+          `Невозможно повторить заказ. Следующие блюда больше недоступны: ${itemNames}`
+        );
+        return;
+      }
+  
+      // Преобразуем элементы заказа в формат для корзины
+      const newCartItems = order.orderItems.map((item) => ({
+        id: item.menuItem.id,
+        name: item.menuItem.name,
+        price: item.priceAtOrderTime,
+        weight: item.menuItem.weight,
+        quantity: item.quantity, // Устанавливаем точное количество из заказа
+      }));
+  
+      // Устанавливаем новые элементы в корзину
+      setCartItemsDirectly(newCartItems);
+  
+      // Перенаправление пользователя на страницу корзины
+      navigate("/cart");
+    } catch (error) {
+      console.error("Ошибка при проверке доступности блюд:", error);
+      alert("Произошла ошибка при повторе заказа. Попробуйте позже.");
+    }
   };
-
+  
 
   useEffect(() => {
     // Получаем данные пользователя из localStorage
@@ -200,16 +232,16 @@ const Profile = () => {
       const error = validateField(field, userData[field]);
       if (error) newErrors[field] = error;
     });
-  
+
     if (Object.values(newErrors).some((error) => error)) {
       setErrors(newErrors);
       return;
     }
-  
+
     try {
       const authData = JSON.parse(localStorage.getItem("authData"));
       const { id } = userData;
-  
+
       // Загружаем всех пользователей
       const [customers, managers, couriers] = await Promise.all([
         getAllCustomers(),
@@ -219,39 +251,34 @@ const Profile = () => {
 
       const adminUser = getUserById(1);
 
-  
       const allUsers = [...customers, ...managers, ...couriers];
-      allUsers.push(adminUser); 
-  
+      allUsers.push(adminUser);
+
       // Проверяем уникальность логина
       const isUsernameTaken = allUsers.some(
         (user) => user.username === userData.email && user.id !== id
       );
-  
+
       if (isUsernameTaken) {
         alert("Этот логин уже занят. Пожалуйста, выберите другой.");
         return;
       }
-  
+
       const updatedData = {
         name: userData.fullName,
         username: userData.email,
         phone: userData.phone,
         address: userData.address,
       };
-  
-      await axios.put(
-        `http://localhost:8080/api/v1/users/${id}`,
-        updatedData,
-        {
-          headers: {
-            Authorization: `Bearer ${authData.accessToken}`,
-          },
-        }
-      );
-  
+
+      await axios.put(`http://localhost:8080/api/v1/users/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${authData.accessToken}`,
+        },
+      });
+
       console.log("Данные успешно обновлены");
-  
+
       if (userData.email !== originalUserData.email) {
         localStorage.removeItem("authData"); // Удаляем данные авторизации
         alert("Логин успешно обновлен! Выполните вход с новым логином.");
@@ -265,8 +292,6 @@ const Profile = () => {
       console.error("Ошибка при обновлении данных:", error);
     }
   };
-  
-  
 
   const handleNextOrder = () => {
     setCurrentOrderIndex((prevIndex) =>
@@ -296,10 +321,12 @@ const Profile = () => {
             value={userData.fullName}
             onChange={handleInputChange}
           />
-          {errors.fullName && <p className="error-message">{errors.fullName}</p>}
-{isFieldChanged.fullName && !isAnyFieldChanged && !errors.fullName &&(
-              <button onClick={handleSave}>Сохранить</button>
-            )}
+          {errors.fullName && (
+            <p className="error-message">{errors.fullName}</p>
+          )}
+          {isFieldChanged.fullName &&
+            !isAnyFieldChanged &&
+            !errors.fullName && <button onClick={handleSave}>Сохранить</button>}
 
           <h2>Телефон</h2>
           <input
@@ -309,9 +336,9 @@ const Profile = () => {
             onChange={handleInputChange}
           />
           {errors.phone && <p className="error-message">{errors.phone}</p>}
-            {isFieldChanged.phone && !isAnyFieldChanged && !errors.phone && (
-              <button onClick={handleSave}>Сохранить</button>
-            )}
+          {isFieldChanged.phone && !isAnyFieldChanged && !errors.phone && (
+            <button onClick={handleSave}>Сохранить</button>
+          )}
 
           <h2>E-mail</h2>
           <input
@@ -321,9 +348,9 @@ const Profile = () => {
             onChange={handleInputChange}
           />
           {errors.email && <p className="error-message">{errors.email}</p>}
-            {isFieldChanged.email && !isAnyFieldChanged && !errors.email && (
-              <button onClick={handleSave}>Сохранить</button>
-            )}
+          {isFieldChanged.email && !isAnyFieldChanged && !errors.email && (
+            <button onClick={handleSave}>Сохранить</button>
+          )}
 
           <h2>Адрес</h2>
           <input
@@ -333,20 +360,22 @@ const Profile = () => {
             onChange={handleInputChange}
           />
           {errors.address && <p className="error-message">{errors.address}</p>}
-            {isFieldChanged.address && !isAnyFieldChanged && !errors.address && (
-              <button onClick={() => handleSave}>Сохранить</button>
-            )}
+          {isFieldChanged.address && !isAnyFieldChanged && !errors.address && (
+            <button onClick={() => handleSave}>Сохранить</button>
+          )}
 
-{isAnyFieldChanged && (
+          {isAnyFieldChanged && (
             <div className="save-all-container">
-              <button className="save-all-button" onClick={handleSave} disabled={Object.values(errors).some(Boolean)}>
+              <button
+                className="save-all-button"
+                onClick={handleSave}
+                disabled={Object.values(errors).some(Boolean)}
+              >
                 Сохранить изменения
               </button>
             </div>
           )}
         </div>
-
-
 
         {/* Текущие заказы */}
         <div className="current-order">
@@ -429,43 +458,41 @@ const Profile = () => {
         )}
       </div>
       {isModalOpen && selectedOrder && (
-  <div className="modal-overlay" onClick={handleCloseModal}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <button className="close-button" onClick={handleCloseModal}>
-        ×
-      </button>
-      <div className="order-card">
-        <div className="order-card-header">
-          <h3>
-            Заказ №{selectedOrder.id}
-            <span className="order-status">{selectedOrder.status}</span>
-          </h3>
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={handleCloseModal}>
+              ×
+            </button>
+            <div className="order-card">
+              <div className="order-card-header">
+                <h3>
+                  Заказ №{selectedOrder.id}
+                  <span className="order-status">{selectedOrder.status}</span>
+                </h3>
+              </div>
+              <div className="order-card-content">
+                <p>Сумма: {selectedOrder.totalPrice} ₽</p>
+                <p>Адрес доставки: {selectedOrder.deliveryAddress}</p>
+                <h4>Состав заказа:</h4>
+                <ul>
+                  {selectedOrder.orderItems.map((item) => (
+                    <li key={item.id}>
+                      <strong>{item.menuItem.name}</strong> — {item.quantity}{" "}
+                      шт. ({item.priceAtOrderTime} ₽)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                className="repeat-order-button"
+                onClick={() => handleRepeatOrder(selectedOrder)}
+              >
+                Повторить заказ
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="order-card-content">
-          <p>Сумма: {selectedOrder.totalPrice} ₽</p>
-          <p>Адрес доставки: {selectedOrder.deliveryAddress}</p>
-          <h4>Состав заказа:</h4>
-          <ul>
-            {selectedOrder.orderItems.map((item) => (
-              <li key={item.id}>
-                <strong>{item.menuItem.name}</strong> — {item.quantity} шт. ({item.priceAtOrderTime} ₽)
-              </li>
-            ))}
-          </ul>
-        </div>
-        <button
-  className="repeat-order-button"
-  onClick={() => handleRepeatOrder(selectedOrder)}
->
-  Повторить заказ
-</button>
-
-
-      </div>
-    </div>
-  </div>
-)}
-
+      )}
     </div>
   );
 };

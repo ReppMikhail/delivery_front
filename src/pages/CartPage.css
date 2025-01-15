@@ -7,7 +7,7 @@
   }
   
   /* Заголовок корзины */
-  h1 {
+  .cart-page h1 {
     font-size: 28px;
     margin-bottom: 20px;
     display: flex;
