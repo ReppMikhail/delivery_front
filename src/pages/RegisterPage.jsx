@@ -59,33 +59,9 @@ function RegisterPage() {
     return !Object.values(validationErrors).some((error) => error);
   };
 
-  const checkUsernameAvailability = async (newUsername) => {
-    try {
-      setIsSaving(true);
-      const [customers, managers, couriers] = await Promise.all([
-        getAllCustomers(),
-        getAllManagers(),
-        getAllCouriers(),
-      ]);
-      const allUsers = [...customers, ...managers, ...couriers];
-      return allUsers.some((user) => user.username === newUsername);
-    } catch (error) {
-      console.error("Ошибка при проверке логина:", error.message);
-      return true; // Если ошибка произошла, лучше не пропускать регистрацию
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleRegister = async () => {
     if (!validateAllFields()) {
       alert("Пожалуйста, исправьте ошибки в форме.");
-      return;
-    }
-
-    const isUsernameTaken = await checkUsernameAvailability(username);
-    if (isUsernameTaken) {
-      alert("Этот логин уже занят. Выберите другой.");
       return;
     }
 
@@ -96,8 +72,8 @@ function RegisterPage() {
       alert("Регистрация успешна!");
       navigate("/main");
     } catch (error) {
-      console.error("Ошибка регистрации:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Ошибка регистрации. Попробуйте ещё раз.");
+      console.error("Такой логин уже занят:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Такой логин уже занят");
     }
   };
 

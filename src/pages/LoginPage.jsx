@@ -1,31 +1,34 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { loginUser } from "../http/authService";
 import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Ошибка общего характера
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    setErrorMessage(""); // Сброс ошибки
+
     if (login && password) {
       try {
         const userData = { username: login, password };
         const response = await loginUser(userData);
-  
+
         console.log("Успешный вход:", response);
-  
+
         // Сохранение данных в localStorage
         const { id, accessToken, refreshToken } = response;
         localStorage.setItem("authData", JSON.stringify({ id, accessToken, refreshToken }));
-  
+
         // Декодирование токена для получения роли
         const decodedToken = jwtDecode(accessToken);
-        const roles = decodedToken.roles; // массив ролей из токена
-  
+        const roles = decodedToken.roles;
+
         console.log("Роль пользователя:", roles);
-  
+
         // Перенаправление в зависимости от роли
         if (roles.includes("ROLE_ADMIN")) {
           navigate("/admin");
@@ -34,17 +37,16 @@ function LoginPage() {
         } else if (roles.includes("ROLE_COURIER")) {
           navigate("/courier");
         } else if (roles.includes("ROLE_CUSTOMER")) {
-            navigate("/main");
+          navigate("/main");
         } else {
           console.error("Неизвестная роль");
-          alert("Ошибка: неизвестная роль пользователя.");
+          setErrorMessage("Ошибка: неизвестная роль пользователя.");
         }
       } catch (error) {
-        console.error("Ошибка авторизации:", error);
-        alert(error.message || "Ошибка входа. Проверьте логин и пароль.");
+        setErrorMessage(error);
       }
     } else {
-      alert("Введите логин и пароль!");
+      setErrorMessage("Введите логин и пароль!");
     }
   };
 
@@ -79,6 +81,9 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+
+        {/* Сообщение об ошибке */}
+        {errorMessage && <div style={styles.error}>{errorMessage}</div>}
 
         {/* Нижняя часть формы */}
         <div style={styles.footer}>
@@ -119,7 +124,7 @@ const styles = {
   inputWrapper: {
     display: "flex",
     alignItems: "center",
-    marginBottom: "15px",
+    marginBottom: "10px",
     width: "100%",
     backgroundColor: "#d6fbd6",
     borderRadius: "30px",
@@ -137,6 +142,14 @@ const styles = {
     fontSize: "16px",
     width: "100%",
     color: "#4a4a4a",
+    fontFamily: "'Roboto', sans-serif",
+  },
+  error: {
+    color: "red",
+    fontSize: "12px",
+    marginBottom: "10px",
+    alignSelf: "flex-start",
+    paddingLeft: "15px",
     fontFamily: "'Roboto', sans-serif",
   },
   footer: {

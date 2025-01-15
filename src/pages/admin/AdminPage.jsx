@@ -148,14 +148,19 @@ const AdminPage = () => {
       alert("Пожалуйста, выберите изображение.");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("file", selectedImage);
-
+  
     try {
       await addImage(menuItemId, formData);
-      alert("Картинка успешно загружена!");
-      setSelectedImage(null);
+      const updatedMenuItems = menuItems.map((item) =>
+        item.id === menuItemId
+          ? { ...item, imageUrl: URL.createObjectURL(selectedImage) } // Обновляем URL картинки
+          : item
+      );
+      setMenuItems(updatedMenuItems); // Обновляем состояние
+      setSelectedImage(null); // Сбрасываем выбранное изображение
     } catch (error) {
       alert(
         `Ошибка загрузки картинки: ${
@@ -164,6 +169,7 @@ const AdminPage = () => {
       );
     }
   };
+  
 
   const handleAddClick = () => {
     setShowForm(true); // Показать форму
@@ -233,10 +239,19 @@ const AdminPage = () => {
       };
 
       if (editMode) {
-        requestData.id = editItemId;
-        await updateMenuItem(requestData);
+        if (!checkIfNameExists) {
+          requestData.id = editItemId;
+          await updateMenuItem(requestData);
+        }
+        else {
+          alert("Блюдо уже существует");
+        }
       } else {
+        if (!checkIfNameExists)
         await createMenuItem(requestData);
+      else {
+        alert("Блюдо уже существует");
+      }
       }
 
       setShowForm(false);
@@ -389,9 +404,9 @@ const AdminPage = () => {
                       "Салат",
                       "Суп",
                       "Основное блюдо", // Обновлено с "Горячее" на "Основное блюдо"
-                      "Гарнир", // Новая категория
                       "Десерт",
                       "Напиток",
+                      "Гарнир", // Новая категория
                     ].map((category) => (
                       <option key={category} value={category}>
                         {category}
