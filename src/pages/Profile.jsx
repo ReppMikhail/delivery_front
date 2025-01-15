@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  getUserById,
+  getAllCouriers,
+  getAllCustomers,
+  getAllManagers,
+  updateUser,
+} from "../http/adminService";
 import "./Profile.css";
 import { useCart } from "../context/CartContext";
 import ValidationHelper from "../components/ValidationHelper"; // Импорт валидации
@@ -203,6 +210,29 @@ const Profile = () => {
       const authData = JSON.parse(localStorage.getItem("authData"));
       const { id } = userData;
   
+      // Загружаем всех пользователей
+      const [customers, managers, couriers] = await Promise.all([
+        getAllCustomers(),
+        getAllManagers(),
+        getAllCouriers(),
+      ]);
+
+      const adminUser = getUserById(1);
+
+  
+      const allUsers = [...customers, ...managers, ...couriers];
+      allUsers.push(adminUser); 
+  
+      // Проверяем уникальность логина
+      const isUsernameTaken = allUsers.some(
+        (user) => user.username === userData.email && user.id !== id
+      );
+  
+      if (isUsernameTaken) {
+        alert("Этот логин уже занят. Пожалуйста, выберите другой.");
+        return;
+      }
+  
       const updatedData = {
         name: userData.fullName,
         username: userData.email,
@@ -222,14 +252,11 @@ const Profile = () => {
   
       console.log("Данные успешно обновлены");
   
-      // Проверяем, изменился ли e-mail
       if (userData.email !== originalUserData.email) {
-        // Если e-mail изменился, перенаправляем пользователя на страницу авторизации
         localStorage.removeItem("authData"); // Удаляем данные авторизации
         alert("Логин успешно обновлен! Выполните вход с новым логином.");
         navigate("/"); // Перенаправление на страницу авторизации
       } else {
-        // Обновляем оригинальные данные и сбрасываем индикаторы изменений
         setOriginalUserData({ ...userData });
         setIsFieldChanged({});
         setIsAnyFieldChanged(false);
@@ -238,6 +265,7 @@ const Profile = () => {
       console.error("Ошибка при обновлении данных:", error);
     }
   };
+  
   
 
   const handleNextOrder = () => {

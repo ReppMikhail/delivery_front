@@ -59,6 +59,7 @@ const NavigationBar = ({
               Закончить смену
             </button>
           )}
+          <button onClick={() => navigate("/courier-profile")}>Личный кабинет</button>
           <button
             onClick={() => {
               localStorage.clear(); // Очищает local storage
@@ -97,6 +98,7 @@ const NavigationBar = ({
           <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
+        <button onClick={() => navigate("/manager-profile")}>Личный кабинет</button>
           <div className="manager-toggle-switch">
             <label className="manager-switch">
               <input

@@ -1,7 +1,15 @@
+import {
+  getUserById,
+  getAllCouriers,
+  getAllCustomers,
+  getAllManagers,
+  updateUser,
+} from "../http/adminService";
+
 const ValidationHelper = {
     validateName(name) {
       if (!name || name.length < 4 || name.length > 60) {
-        return "Имя должно содержать от 4 до 60 символов.";
+        return "ФИО должно содержать от 4 до 60 символов.";
       }
       return null;
     },

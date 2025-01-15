@@ -17,6 +17,8 @@ import Orders from "./pages/admin/Orders";
 import Directory from "./pages/admin/Directory";
 import Ingridients from "./pages/admin/Ingridients";
 import AdminProfile from "./pages/admin/AdminProfile";
+import ManagerProfile from "./pages/ManagerProfile";
+import CourierProfile from "./pages/CourierProfile";
 import AboutSystem from "./pages/AboutSystem"; // Импорт компонента "О системе"
 import AboutDevelopers from "./pages/AboutDevelopers"; // Импорт компонента "О разработчиках"
 import { jwtDecode } from "jwt-decode";
@@ -76,6 +78,9 @@ function App() {
 
       <Route path="/manager" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerPage /></ProtectedRoute>} />
       <Route path="/courier" element={<ProtectedRoute role="ROLE_COURIER"><CourierPage /></ProtectedRoute>} />
+      <Route path="/manager-profile" element={<ProtectedRoute role="ROLE_MANAGER"><ManagerProfile /></ProtectedRoute>} />
+      <Route path="/courier-profile" element={<ProtectedRoute role="ROLE_COURIER"><CourierProfile /></ProtectedRoute>} />
+
 
       <Route path="/main" element={<ProtectedRoute role="ROLE_CUSTOMER"><MainPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute role="ROLE_CUSTOMER"><Profile /></ProtectedRoute>} />

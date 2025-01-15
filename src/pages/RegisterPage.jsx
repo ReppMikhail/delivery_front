@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAllCustomers, getAllManagers, getAllCouriers } from "../http/adminService";
 import { registerUser } from "../http/authService";
+import ValidationHelper from "../components/ValidationHelper";
 
 function RegisterPage() {
   const [name, setName] = useState("");
@@ -9,33 +11,94 @@ function RegisterPage() {
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
 
+  const validateField = (fieldName, value) => {
+    let error = null;
+    switch (fieldName) {
+      case "name":
+        error = ValidationHelper.validateName(value);
+        break;
+      case "phone":
+        error = ValidationHelper.validatePhone(value);
+        break;
+      case "username":
+        error = ValidationHelper.validateEmail(value);
+        break;
+      case "address":
+        error = ValidationHelper.validateAddress(value);
+        break;
+      case "password":
+        if (value.length < 8 || value.length > 16) {
+          error = "Пароль должен содержать от 8 до 16 символов.";
+        }
+        break;
+      case "passwordConfirmation":
+        if (value !== password) {
+          error = "Пароли не совпадают!";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  const validateAllFields = () => {
+    const validationErrors = {
+      name: validateField("name", name),
+      phone: validateField("phone", phone),
+      username: validateField("username", username),
+      address: validateField("address", address),
+      password: validateField("password", password),
+      passwordConfirmation: validateField("passwordConfirmation", passwordConfirmation),
+    };
+    setErrors(validationErrors);
+    return !Object.values(validationErrors).some((error) => error);
+  };
+
+  const checkUsernameAvailability = async (newUsername) => {
+    try {
+      setIsSaving(true);
+      const [customers, managers, couriers] = await Promise.all([
+        getAllCustomers(),
+        getAllManagers(),
+        getAllCouriers(),
+      ]);
+      const allUsers = [...customers, ...managers, ...couriers];
+      return allUsers.some((user) => user.username === newUsername);
+    } catch (error) {
+      console.error("Ошибка при проверке логина:", error.message);
+      return true; // Если ошибка произошла, лучше не пропускать регистрацию
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleRegister = async () => {
-    if (password !== passwordConfirmation) {
-      alert("Пароли не совпадают!");
+    if (!validateAllFields()) {
+      alert("Пожалуйста, исправьте ошибки в форме.");
+      return;
+    }
+
+    const isUsernameTaken = await checkUsernameAvailability(username);
+    if (isUsernameTaken) {
+      alert("Этот логин уже занят. Выберите другой.");
       return;
     }
 
     try {
-      const userData = {
-        name,
-        phone,
-        username,
-        address,
-        password,
-        passwordConfirmation,
-      };
-
-      const response = await registerUser(userData); // Вызов функции регистрации
+      const userData = { name, phone, username, address, password, passwordConfirmation };
+      const response = await registerUser(userData);
       console.log("Пользователь зарегистрирован:", response);
       alert("Регистрация успешна!");
-      navigate("/main"); // Перенаправление на главную
+      navigate("/main");
     } catch (error) {
       console.error("Ошибка регистрации:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Ошибка регистрации. Попробуйте ещё раз.");
     }
-    
   };
 
   const goToLogin = () => {
@@ -53,9 +116,13 @@ function RegisterPage() {
             placeholder="Введите ФИО"
             style={styles.input}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setErrors((prev) => ({ ...prev, name: validateField("name", e.target.value) }));
+            }}
           />
         </div>
+        {errors.name && <p style={styles.error}>{errors.name}</p>}
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>📞</span>
@@ -64,9 +131,13 @@ function RegisterPage() {
             placeholder="Введите Телефон"
             style={styles.input}
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              setErrors((prev) => ({ ...prev, phone: validateField("phone", e.target.value) }));
+            }}
           />
         </div>
+        {errors.phone && <p style={styles.error}>{errors.phone}</p>}
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>📧</span>
@@ -75,9 +146,13 @@ function RegisterPage() {
             placeholder="Введите Email"
             style={styles.input}
             value={username}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrors((prev) => ({ ...prev, username: validateField("username", e.target.value) }));
+            }}
           />
         </div>
+        {errors.username && <p style={styles.error}>{errors.username}</p>}
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>🏠</span>
@@ -86,9 +161,13 @@ function RegisterPage() {
             placeholder="Введите Адрес"
             style={styles.input}
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => {
+              setAddress(e.target.value);
+              setErrors((prev) => ({ ...prev, address: validateField("address", e.target.value) }));
+            }}
           />
         </div>
+        {errors.address && <p style={styles.error}>{errors.address}</p>}
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>🔒</span>
@@ -97,9 +176,13 @@ function RegisterPage() {
             placeholder="Введите пароль"
             style={styles.input}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrors((prev) => ({ ...prev, password: validateField("password", e.target.value) }));
+            }}
           />
         </div>
+        {errors.password && <p style={styles.error}>{errors.password}</p>}
 
         <div style={styles.inputWrapper}>
           <span style={styles.icon}>🔒</span>
@@ -108,15 +191,22 @@ function RegisterPage() {
             placeholder="Повторите пароль"
             style={styles.input}
             value={passwordConfirmation}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setErrors((prev) => ({
+                ...prev,
+                passwordConfirmation: validateField("passwordConfirmation", e.target.value),
+              }));
+            }}
           />
         </div>
+        {errors.passwordConfirmation && <p style={styles.error}>{errors.passwordConfirmation}</p>}
 
         <div style={styles.footer}>
           <button style={styles.loginLink} onClick={goToLogin}>
             Уже есть аккаунт?
           </button>
-          <button style={styles.registerButton} onClick={handleRegister}>
+          <button style={styles.registerButton} onClick={handleRegister} disabled={isSaving}>
             <span style={styles.arrow}>→</span>
           </button>
         </div>
@@ -202,6 +292,13 @@ const styles = {
     color: "#ffffff",
     fontSize: "20px",
     fontWeight: "bold",
+  },
+  error: {
+    color: "red",
+    fontSize: "12px",
+    marginTop: "-10px",
+    marginBottom: "10px",
+    fontFamily: "'Roboto', sans-serif",
   },
 };
 
