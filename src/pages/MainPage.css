@@ -41,6 +41,7 @@ h2 {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Ширина карточки увеличена */
   gap: 20px;
   padding: 20px;
+  cursor:pointer;
 }
 
 .dish-card {

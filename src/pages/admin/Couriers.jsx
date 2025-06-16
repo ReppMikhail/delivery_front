@@ -207,7 +207,7 @@ const CouriersPage = () => {
                     <p>Логин: {courier.username}</p>
                     <p>Телефон: {courier.phone}</p>
                     <p>Адрес: {courier.address}</p>
-                    <p>Роли: {courier.roles.join(", ")}</p>
+                    {/* <p>Роли: {courier.roles.join(", ")}</p> */}
                     {courierShiftData ? (
                       <div>
                         <p>На смене: {courierShiftData.onShift ? "Да" : "Нет"}</p>

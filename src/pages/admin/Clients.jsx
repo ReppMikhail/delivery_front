@@ -188,7 +188,7 @@ const ClientsPage = () => {
                   <p>Логин: {client.username}</p>
                   <p>Телефон: {client.phone}</p>
                   <p>Адрес: {client.address}</p>
-                  <p>Роли: {client.roles.join(", ")}</p>
+                  {/* <p>Роли: {client.roles.join(", ")}</p> */}
                 </div>
               </li>
             ))}

@@ -33,6 +33,7 @@ const NavigationBar = ({
     return (
       <header className="navbar">
         <div className="navbar-left">
+          <span>Вкус есть</span>
           <button onClick={() => navigate("/courier")}>Заказы</button>
           <div
             className="dropdown-container"
@@ -46,12 +47,12 @@ const NavigationBar = ({
                   О системе
                 </button>
                 <button onClick={() => navigate("/about/developers")}>
-                  О разработчиках
+                  О разработчике
                 </button>
               </div>
             )}
           </div>
-          <span>+7 937 123 98 56</span>
+          
         </div>
         <div className="navbar-right">
           {courierStatus?.onShift && (
@@ -77,6 +78,7 @@ const NavigationBar = ({
     return (
       <header className="navbar">
         <div className="navbar-left">
+          <span>Вкус есть</span>
           <button onClick={() => navigate("/manager")}>Заказы</button>
           <div
             className="dropdown-container"
@@ -90,12 +92,11 @@ const NavigationBar = ({
                   О системе
                 </button>
                 <button onClick={() => navigate("/about/developers")}>
-                  О разработчиках
+                  О разработчике
                 </button>
               </div>
             )}
           </div>
-          <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
         <button onClick={() => navigate("/manager-profile")}>Личный кабинет</button>
@@ -129,6 +130,7 @@ const NavigationBar = ({
     return (
       <header className="navbar">
         <div className="navbar-left">
+          <span>Вкус есть</span>
           <button onClick={() => navigate("/main")}>Главная</button>
           <div
             className="dropdown-container"
@@ -142,12 +144,11 @@ const NavigationBar = ({
                   О системе
                 </button>
                 <button onClick={() => navigate("/about/developers")}>
-                  О разработчиках
+                  О разработчике
                 </button>
               </div>
             )}
           </div>
-          <span>+7 937 123 98 56</span>
         </div>
         <div className="navbar-right">
           <button onClick={() => navigate("/profile")}>Личный кабинет</button>
@@ -169,6 +170,7 @@ const NavigationBar = ({
     return (
       <header className="navbar">
         <div className="navbar-left">
+          <span>Вкус есть</span>
           <button onClick={() => navigate("/admin")}>Блюда</button>
           <button onClick={() => navigate("/clients")}>Клиенты</button>
           <button onClick={() => navigate("/managers")}>Менеджеры</button>
@@ -191,7 +193,7 @@ const NavigationBar = ({
                   О системе
                 </button>
                 <button onClick={() => navigate("/about/developers")}>
-                  О разработчиках
+                  О разработчике
                 </button>
               </div>
             )}
