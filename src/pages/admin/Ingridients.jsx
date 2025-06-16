@@ -43,41 +43,53 @@ const IngredientsPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
-      // Укажите accessToken
       const authData = JSON.parse(localStorage.getItem("authData"));
+  
+      const headers = {
+        Authorization: `Bearer ${authData.accessToken}`,
+      };
   
       // Загружаем активные блюда
       const activeMenuItems = await fetch("http://localhost:8080/api/v1/menuitems", {
-        headers: {
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
+        headers,
       }).then((res) => res.json());
   
       // Загружаем архивные блюда
       const archivedMenuItems = await fetch("http://localhost:8080/api/v1/menuitems/archive", {
-        headers: {
-          Authorization: `Bearer ${authData.accessToken}`,
-        },
+        headers,
       }).then((res) => res.json());
   
-      // Проверяем, используется ли ингредиент
-      const isUsedInActiveMenu = activeMenuItems.some((item) =>
+      // Фильтруем блюда по наличию ингредиента
+      const usedInActive = activeMenuItems.filter((item) =>
         item.ingredients.some((ingredient) => ingredient.id === id)
       );
-      const isUsedInArchivedMenu = archivedMenuItems.some((item) =>
+      const usedInArchive = archivedMenuItems.filter((item) =>
         item.ingredients.some((ingredient) => ingredient.id === id)
       );
   
-      if (isUsedInActiveMenu || isUsedInArchivedMenu) {
-        alert("Этот ингредиент используется в блюдах и не может быть удален.");
+      if (usedInActive.length > 0 || usedInArchive.length > 0) {
+        const activeNames = usedInActive.map((item) => item.name).join(", ");
+        const archivedNames = usedInArchive.map((item) => item.name).join(", ");
+  
+        let message = "Нельзя удалить ингредиент. Он используется в следующих блюдах:\n";
+        if (activeNames) {
+          message += `\nВ меню: ${activeNames}`;
+        }
+        if (archivedNames) {
+          message += `\nВ архиве: ${archivedNames}`;
+        }
+  
+        alert(message);
         return;
       }
   
-      // Если ингредиент нигде не используется, удаляем его
-      await deleteIngredient(id);
-      loadIngredients();
+      // Подтверждение удаления
+      if (window.confirm("Вы уверены, что хотите удалить этот ингредиент?")) {
+        await deleteIngredient(id);
+        loadIngredients();
+      }
     } catch (error) {
-      console.error("Ошибка удаления ингредиента:", error);
+      console.error("Ошибка при удалении ингредиента:", error);
     }
   };
   

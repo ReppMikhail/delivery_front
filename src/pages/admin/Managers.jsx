@@ -4,6 +4,7 @@ import {
   getAllManagers,
   getAllCustomers,
   getAllCouriers,
+  getAllOrders,
   createEmployee,
   updateUser,
   deleteUser,
@@ -68,10 +69,26 @@ const ManagersPage = () => {
 
   const handleDeleteClick = async (id) => {
     try {
+      // Получить все заказы
+      const orders = await getAllOrders();
+  
+      // Проверить заказы, относящиеся к менеджеру
+      const hasActiveOrders = orders.some(
+        (order) =>
+          order.status !== "доставлен" &&
+          order.status !== "отменен"
+      );
+  
+      if (hasActiveOrders) {
+        alert("Невозможно удалить менеджера, так как имеются активные заказы.");
+        return;
+      }
+  
+      // Удалить менеджера, если нет активных заказов
       await deleteUser(id);
       loadManagers();
     } catch (error) {
-      console.error("Error deleting manager:", error);
+      console.error("Ошибка удаления менеджера:", error);
     }
   };
 
@@ -169,7 +186,7 @@ const ManagersPage = () => {
                   <strong>{manager.name}</strong>
                   <p>Логин: {manager.username}</p>
                   <p>Телефон: {manager.phone}</p>
-                  <p>Роли: {manager.roles.join(", ")}</p>
+                  {/* <p>Роли: {manager.roles.join(", ")}</p> */}
                 </div>
               </li>
             ))}

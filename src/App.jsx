@@ -90,21 +90,3 @@ function App() {
 }
 
 export default App;
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<LoginPage />} />
-//         <Route path="/register" element={<RegisterPage />} />
-//         <Route path="/main" element={<MainPage />} />
-//         <Route path="/manager" element={ <ProtectedRoute role="manager"> <ManagerPage /> </ProtectedRoute>}/>
-//         <Route path="/courier" element={ <ProtectedRoute role="courier"> <CourierPage /> </ProtectedRoute>}/>
-//         {/* <Route path="/cart" element={<CartPage />} />
-//         <Route path="/profile" element={<ProfilePage />} /> */}
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;

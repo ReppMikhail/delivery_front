@@ -55,8 +55,7 @@ export const putIngredient = async (name) => {
     // Удалить ингредиент
     export const deleteIngredient = async (id) => {
       try {
-        const response = await axiosInstance.delete(`${API_BASE_URL}/ingredients/${id}`);
-        return response.data;
+        await axiosInstance.delete(`${API_BASE_URL}/ingredients/${id}`);
       } catch (error) {
         throw error.response ? error.response.data : new Error("Network Error");
       }
@@ -76,6 +75,16 @@ export const getAllKitchens = async () => {
 export const getAllMenuItems = async () => {
     try {
       const response = await axiosInstance.get(`${API_BASE_URL}/menuitems`);
+      return response.data;
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+// Получить список архивных блюд
+export const getArchiveMenuItems = async () => {
+    try {
+      const response = await axiosInstance.get(`${API_BASE_URL}/menuitems/archive`);
       return response.data;
     } catch (error) {
       throw error.response ? error.response.data : new Error("Network Error");
@@ -116,6 +125,22 @@ export const getAllMenuItems = async () => {
   export const deleteMenuItem = async (id) => {
     try {
       await axiosInstance.delete(`${API_BASE_URL}/menuitems/${id}`);
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const restoreMenuItem = async (id) => {
+    try {
+      await axiosInstance.put(`${API_BASE_URL}/menuitems/${id}/restore`);
+    } catch (error) {
+      throw error.response ? error.response.data : new Error("Network Error");
+    }
+  };
+
+  export const permanentlyDeleteMenuItem = async (id) => {
+    try {
+      await axiosInstance.delete(`${API_BASE_URL}/menuitems/${id}/permanent`);
     } catch (error) {
       throw error.response ? error.response.data : new Error("Network Error");
     }

@@ -303,6 +303,17 @@
   margin-left: 20px;
 }
 
+.admin-archive-button {
+  background-color: #2e58e1;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-left: 20px;
+}
+
 .admin-add-item-button:hover {
   background-color: #45a049;
 }
